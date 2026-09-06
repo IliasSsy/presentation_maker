@@ -12,7 +12,7 @@ function createPresentation(name: string, defaultSlide: Slide, id: string, creat
         id,
         slides: [defaultSlide],
         name,
-        secure: 'linkedOnly',
+        access: 'linkedOnly',
         created,
         activeSlideId: defaultSlide.id,
     }

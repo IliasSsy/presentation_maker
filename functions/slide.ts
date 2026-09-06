@@ -7,7 +7,7 @@ const id:string = generateId()
 function createDefaultSlide(id: string, name?: string): Slide {
     return {
         id,
-        name: name ?? '',
+        name: name ?? 'Слайд 1',
         number: 1,
         background: { type: 'none' },
         elements: [],
@@ -21,15 +21,30 @@ function addSlide(presentation: Presentation, slideId: string, slideName?: strin
     return {
         ...presentation,
         slides: [...presentation.slides, newSlide],
+        activeSlideId: presentation.activeSlideId === '' ? slideId : presentation.activeSlideId
     };
 }
 
 function removeSlide(presentation: Presentation, id: string): Presentation {
-    const index:number = presentation.slides.findIndex(slide => slide.id === id)
+    const index = presentation.slides.findIndex(slide => slide.id === id);
+    if (index === -1) {
+        return presentation
+    }
+    let activeSlideId = presentation.activeSlideId;
+    if (presentation.activeSlideId === id) {
+        if (presentation.slides.length <= 1) {
+            activeSlideId = '';
+        } else if (index < presentation.slides.length - 1) {
+            activeSlideId = presentation.slides[index + 1].id;
+        } else {
+            activeSlideId = presentation.slides[index - 1].id;
+        }
+    }
     return {
         ...presentation,
-        slides: [...presentation.slides.slice(0, index), ...presentation.slides.slice(index + 1)]
-    }
+        slides: [...presentation.slides.slice(0, index), ...presentation.slides.slice(index + 1)],
+        activeSlideId
+    };
 }
 
 function moveSlide(presentation: Presentation, id: string, newPosition: number): Presentation {
@@ -62,5 +77,6 @@ export {
     duplicateSlide,
     setActiveSlide,
     moveSlide,
-    addSlide
+    addSlide,
+    removeSlide
 }
