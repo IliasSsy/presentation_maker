@@ -5,6 +5,9 @@ import type { SlideObject } from "../types/objects.js";
 const DefaultVal:number = 0;
 
 function setSlideBackgroundColor(slide: Slide, color: string): Slide {
+    if (!color) {
+        return slide
+    }
     return {
         ...slide,
         background: {type: 'color', color}
@@ -12,6 +15,21 @@ function setSlideBackgroundColor(slide: Slide, color: string): Slide {
 }
 
 function setSlideBackgroundImage(slide: Slide, url: string): Slide {
+    const dot = url.lastIndexOf('.')
+    if (dot === -1) {
+        return slide
+    }
+    const format = url.slice(dot)
+    if (
+        format !== '.png' &&
+        format !== '.img' &&
+        format !== '.jpg' &&
+        format !== '.jpeg' &&
+        format !== '.webp' &&
+        format !== '.gif'
+    ) {
+        return slide
+    }
     return {
         ...slide,
         background: {type: 'image', url}
@@ -61,6 +79,21 @@ function addTextObject(slide: Slide, content: string, x: number, y: number, widt
 }
 
 function addImageObject(slide: Slide, url: string, x: number, y: number, width: number, height: number, objectId: string): Slide {
+    const dot = url.lastIndexOf('.')
+    if (dot === -1) {
+        return slide
+    }
+    const format = url.slice(dot)
+    if (
+        format !== '.png' &&
+        format !== '.img' &&
+        format !== '.jpg' &&
+        format !== '.jpeg' &&
+        format !== '.webp' &&
+        format !== '.gif'
+    ) {
+        return slide
+    }
     const imageObject:SlideObject = {
         id: objectId,
         position: {x, y},
@@ -78,6 +111,9 @@ function addImageObject(slide: Slide, url: string, x: number, y: number, width: 
 
 function removeObject(slide: Slide, objectId: string): Slide {
     const index:number = slide.elements.findIndex(object => object.id === objectId)
+    if (index === -1) {
+        return slide;
+    }
     return {
         ...slide,
         elements: [...slide.elements.slice(0, index), ...slide.elements.slice(index + 1)]
@@ -86,6 +122,9 @@ function removeObject(slide: Slide, objectId: string): Slide {
 
 function resizeObject(slide: Slide, objectId: string, newWidth: number, newHeight: number) {
     const index:number = slide.elements.findIndex(object => object.id === objectId)
+    if (index === -1) {
+        return slide
+    }
     const element:SlideObject = slide.elements[index];
     let newElement: SlideObject;
     if (element.type === 'figure' && element.typeFigure === 'circle') {
@@ -108,6 +147,9 @@ function resizeObject(slide: Slide, objectId: string, newWidth: number, newHeigh
 
 function moveObject(slide: Slide, objectId: string, newX: number, newY: number): Slide {
     const index:number = slide.elements.findIndex(object => object.id === objectId);
+    if (index === -1) {
+        return slide
+    }
     const element:SlideObject = slide.elements[index];
     const newElement:SlideObject = {
         ...element,
@@ -121,6 +163,9 @@ function moveObject(slide: Slide, objectId: string, newX: number, newY: number):
 
 function updateTextObjectStyle(slide: Slide, objectId: string, fontFamily: string, fontSize: number, fontColor: string): Slide {
     const index:number = slide.elements.findIndex(object => object.id === objectId);
+    if (index === -1) {
+        return slide;
+    }
     const element:SlideObject = slide.elements[index];
     if (element.type !== 'text') {
         return slide;
@@ -138,4 +183,17 @@ function updateTextObjectStyle(slide: Slide, objectId: string, fontFamily: strin
         ...slide,
         elements: [...slide.elements.slice(0, index), newElement, ...slide.elements.slice(index + 1)]
     }
+}
+
+export {
+    setSlideBackgroundColor,
+    setSlideBackgroundImage,
+    setSlideBackgroundGradient,
+    clearSlideBackground,
+    addTextObject,
+    addImageObject,
+    removeObject,
+    resizeObject,
+    moveObject,
+    updateTextObjectStyle
 }

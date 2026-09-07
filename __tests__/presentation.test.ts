@@ -3,16 +3,16 @@ import {
     createPresentation,
     updatePresentationName,
     savePresentation,
-    loadPresentation
+    loadPresentation,
+    updatePresentationAccess
 } from '../functions/presentation.js';
 import { addSlide } from '../functions/slide.js';
 import { createDefaultSlide } from '../functions/slide.js';
-import { generateId } from '../functions/utils.js';
 import { Presentation } from '../types/presentation.js';
 
 describe('createPresentation', () => {
-    it('create a presentation with default slide and with generatedId', () => {
-        const id = generateId()
+    it('create a presentation with default slide', () => {
+        const id = 'presentation1'
         const defaultSlide = createDefaultSlide('slide1')
         const created = new Date()
 
@@ -49,6 +49,15 @@ describe('updatePresentationName', () => {
 
         expect(result.name).toBe('')
     })
+    it('does not mutate the original presentation', () => {
+        const defaultSlide = createDefaultSlide('slide1');
+        const presentation = createPresentation('First Presentation', defaultSlide, 'presentation1', new Date());
+
+        const result = updatePresentationName('New Name', presentation);
+
+        expect(presentation.name).toBe('First Presentation');
+        expect(result.name).toBe('New Name');
+    });
 })
 
 describe('savePresentation', () => {
@@ -61,6 +70,21 @@ describe('savePresentation', () => {
 
         expect(result).toBe(JSON.stringify(presentation, null, 2))
     })
+    it('save empty presentation', () => {
+        const presentation: Presentation = {
+            id: 'presentation1',
+            name: 'My Pres',
+            access: 'linkedOnly',
+            created: new Date(),
+            slides: [],
+            activeSlideId: '',
+        };
+
+        const result = savePresentation(presentation);
+
+        expect(result).toBe(JSON.stringify(presentation, null, 2));
+
+    });
 })
 
 describe('loadPresentation', () => {
@@ -126,4 +150,52 @@ describe('addSlide', () => {
         expect(result.slides[1].id).toBe('slide2');
         expect(result.slides[1].name).toBe('Мой слайд');
     });
+    it('does not mutate the original presentation', () => {
+        const defaultSlide = createDefaultSlide('slide1');
+        const presentation = createPresentation('First Presentation', defaultSlide, 'presentation1', new Date());
+
+        const result = addSlide(presentation, 'slide2');
+
+        expect(presentation.slides).toHaveLength(1);
+        expect(presentation.slides[0].id).toBe('slide1');
+        expect(result.slides).toHaveLength(2);
+        expect(result.slides[1].id).toBe('slide2');
+    });
 })
+
+describe('updatePresentationAccess', () => {
+    it('update presentation access to public', () => {
+        const slide = createDefaultSlide('slide1');
+        const presentation = createPresentation('My Pres', slide, 'presentation1', new Date());
+
+        const result = updatePresentationAccess(
+            presentation,
+            'public'
+        );
+
+        expect(result.access).toBe('public');
+    });
+
+    it('update presentation access to linkedOnly', () => {
+        const slide = createDefaultSlide('slide1');
+        const presentation = createPresentation('My Pres', slide, 'presentation1', new Date());
+
+        const result = updatePresentationAccess(presentation, 'linkedOnly');
+
+        expect(result.access).toBe('linkedOnly');
+    });
+
+    it('does not mutate the original presentation', () => {
+        const slide = createDefaultSlide('slide1');
+        const presentation = createPresentation('My Pres', slide, 'presentation1', new Date());
+
+        const result = updatePresentationAccess(
+            presentation,
+            'public'
+        );
+
+        expect(presentation.access).toBe('linkedOnly');
+        expect(result.access).toBe('public');
+    });
+
+});
