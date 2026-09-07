@@ -16,8 +16,8 @@ function createDefaultSlide(id: string, name?: string): Slide {
 }
 
 function addSlide(presentation: Presentation, slideId: string, slideName?: string): Presentation {
-    const name = slideName ?? `Слайд ${presentation.slides.length + 1}`;
-    const newSlide = createDefaultSlide(slideId, name);
+    const name:string = slideName ?? `Слайд ${presentation.slides.length + 1}`;
+    const newSlide:Slide = createDefaultSlide(slideId, name);
     return {
         ...presentation,
         slides: [...presentation.slides, newSlide],
@@ -26,7 +26,7 @@ function addSlide(presentation: Presentation, slideId: string, slideName?: strin
 }
 
 function removeSlide(presentation: Presentation, id: string): Presentation {
-    const index = presentation.slides.findIndex(slide => slide.id === id);
+    const index:number = presentation.slides.findIndex(slide => slide.id === id);
     if (index === -1) {
         return presentation
     }
@@ -49,6 +49,9 @@ function removeSlide(presentation: Presentation, id: string): Presentation {
 
 function moveSlide(presentation: Presentation, id: string, newPosition: number): Presentation {
     const index:number = presentation.slides.findIndex(slide => slide.id === id);
+    if (index === -1) {
+        return presentation
+    }
     const slide:Slide = presentation.slides[index];
     const newPresentation = removeSlide(presentation, id);
     return {
@@ -58,6 +61,10 @@ function moveSlide(presentation: Presentation, id: string, newPosition: number):
 }
 
 function setActiveSlide(presentation: Presentation, id: string): Presentation {
+    const slide:Slide|undefined = presentation.slides.find(slide => slide.id === id)
+    if (!slide) {
+        return presentation
+    }
     return {
         ...presentation,
         activeSlideId: id
@@ -65,11 +72,22 @@ function setActiveSlide(presentation: Presentation, id: string): Presentation {
 }
 
 function duplicateSlide(presentation: Presentation, slide: Slide): Presentation {
-    const index = presentation.slides.findIndex(item => item.id === slide.id)
+
+    if (!slide) {
+        return presentation;
+    }
+    const index:number = presentation.slides.findIndex(item => item.id === slide.id);
+    if (index === -1) {
+        return presentation;
+    }
     return {
         ...presentation,
-        slides: [...presentation.slides.slice(0, index), slide, ...presentation.slides.slice(index)]
-    }
+        slides: [
+            ...presentation.slides.slice(0, index),
+            slide,
+            ...presentation.slides.slice(index)
+        ]
+    };
 }
 
 export {

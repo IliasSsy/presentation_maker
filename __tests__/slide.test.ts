@@ -6,6 +6,7 @@ import {
         moveSlide,
         setActiveSlide,
         duplicateSlide,
+        addSlide,
 } from '../functions/slide.js';
 import { createPresentation } from '../functions/presentation.js';
 export type {Slide} from '../types/slide.js'
@@ -163,5 +164,161 @@ describe('removeSlide', () => {
 });
 
 describe('moveSlide', () => {
-    it()
+    it('move slide to another position', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1')
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date())
+        const presentation2 = addSlide(presentation, 'slide2');
+        const presentation3 = addSlide(presentation2, 'slide3');
+        const result = moveSlide(presentation3, 'slide2', 2);
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide3',
+            'slide2'
+        ])
+    })
+
+    it('move last slide to first position', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1')
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date())
+        const presentation2 = addSlide(presentation, 'slide2')
+        const presentation3 = addSlide(presentation2, 'slide3')
+
+        const result = moveSlide(presentation3, 'slide3', 0)
+
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide3',
+            'slide1',
+            'slide2'
+        ])
+    })
+
+    it('move middle slide to another position', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const presentation2 = addSlide(presentation, 'slide2');
+        const presentation3 = addSlide(presentation2, 'slide3');
+
+        const result = moveSlide(presentation3, 'slide2', 2);
+
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide3',
+            'slide2'
+        ]);
+    });
+
+    it('move slide to the same position', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const presentation2 = addSlide(presentation, 'slide2');
+        const presentation3 = addSlide(presentation2, 'slide3');
+
+        const result = moveSlide(presentation3, 'slide2', 1);
+
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide2',
+            'slide3'
+        ]);
+    });
+
+
+    it('return presentation if slide does not exist', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+
+        const presentation2 = addSlide(presentation, 'slide2');
+
+        const result = moveSlide(presentation2, 'unknown', 1);
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide2'
+        ]);
+    });
 })
+
+describe('setActiveSlide', () => {
+    it('set existing slide as active', () => {
+        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
+
+        const result = setActiveSlide(presentation, 'slide1');
+
+        expect(result.activeSlideId).toBe('slide1');
+    });
+
+    it('do not change active slide if slide does not exist', () => {
+        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date())
+
+        const result = setActiveSlide(presentation, 'unknown');
+
+        expect(result.activeSlideId).toBe('slide1');
+    });
+});
+
+describe('duplicateSlide', () => {
+    it('duplicate first slide', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const presentation2 = addSlide(presentation, 'slide2');
+
+        const result = duplicateSlide(presentation2, firstSlide);
+
+        expect(result.slides).toHaveLength(3);
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide1',
+            'slide2'
+        ]);
+    });
+
+
+    it('duplicate middle slide', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const presentation2 = addSlide(presentation, 'slide2');
+        const presentation3 = addSlide(presentation2, 'slide3');
+        const middleSlide = presentation3.slides[1];
+
+        const result = duplicateSlide(presentation3, middleSlide);
+
+        expect(result.slides).toHaveLength(4);
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide2',
+            'slide2',
+            'slide3'
+        ]);
+    });
+
+    it('duplicate last slide', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const presentation2 = addSlide(presentation, 'slide2');
+        const presentation3 = addSlide(presentation2, 'slide3');
+        const lastSlide = presentation3.slides[2];
+
+        const result = duplicateSlide(presentation3, lastSlide);
+
+        expect(result.slides).toHaveLength(4);
+        expect(result.slides.map(slide => slide.id)).toEqual([
+            'slide1',
+            'slide2',
+            'slide3',
+            'slide3'
+        ]);
+    });
+
+
+    it('return presentation if slide does not exist', () => {
+        const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
+        const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
+        const unknownSlide = createDefaultSlide('unknown', 'Unknown');
+
+        const result = duplicateSlide(presentation, unknownSlide);
+
+        expect(result.slides).toHaveLength(1);
+        expect(result.slides[0].id).toBe('slide1');
+    });
+});

@@ -22,7 +22,7 @@ describe('createPresentation', () => {
             id,
             slides: [defaultSlide],
             name: 'My Presentation',
-            secure: 'linkedOnly',
+            access: 'linkedOnly',
             created,
             activeSlideId: 'slide1'
         })
