@@ -31,10 +31,27 @@ function savePresentation(presentation: Presentation): string {
 
 function loadPresentation(json: string): Presentation {
     const presentation = JSON.parse(json);
+    if (
+        typeof presentation.id !== 'string' ||
+        typeof presentation.name !== 'string' ||
+        !['access', 'public', 'linkedOnly'].includes(presentation.access) ||
+        typeof presentation.created !== 'string' ||
+        !Array.isArray(presentation.slides) ||
+        typeof presentation.activeSlideId !== 'string'
+    ) {
+        throw new Error('Invalid presentation');
+    }
     return {
         ...presentation,
         created: new Date(presentation.created)
     }
+}
+
+function updatePresentationAccess(presentation: Presentation, access: "private" | "public" | "linkedOnly"): Presentation {
+    return {
+        ...presentation,
+        access
+    };
 }
 
 export {
@@ -42,4 +59,5 @@ export {
     updatePresentationName,
     savePresentation,
     loadPresentation,
+    updatePresentationAccess
 };
