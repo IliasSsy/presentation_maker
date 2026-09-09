@@ -8,7 +8,7 @@ function createPresentation(name: string, defaultSlide: Slide, id: string, creat
         name,
         access: 'linkedOnly',
         created,
-        activeSlideId: defaultSlide.id,
+
     }
 }
 
@@ -23,21 +23,24 @@ function savePresentation(presentation: Presentation): string {
     return JSON.stringify(presentation, null, 2)
 }
 
-function loadPresentation(json: string): Presentation {
-    const presentation = JSON.parse(json);
-    if (
-        typeof presentation.id !== 'string' ||
-        typeof presentation.name !== 'string' ||
-        !['private', 'public', 'linkedOnly'].includes(presentation.access) ||
-        typeof presentation.created !== 'string' ||
-        !Array.isArray(presentation.slides) ||
-        typeof presentation.activeSlideId !== 'string'
-    ) {
-        throw new Error('Invalid presentation');
-    }
-    return {
-        ...presentation,
-        created: new Date(presentation.created)
+function loadPresentation(json: string): Presentation | null {
+    try {
+        const presentation = JSON.parse(json);
+        if (
+            typeof presentation.id !== 'string' ||
+            typeof presentation.name !== 'string' ||
+            !['private', 'public', 'linkedOnly'].includes(presentation.access) ||
+            typeof presentation.created !== 'string' ||
+            !Array.isArray(presentation.slides)
+        ) {
+            return null;
+        }
+        return {
+            ...presentation,
+            created: new Date(presentation.created)
+        }
+    } catch {
+        return null;
     }
 }
 

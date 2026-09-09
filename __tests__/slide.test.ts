@@ -11,7 +11,7 @@ export type {Slide} from '../types/slide.js'
 
 
 describe('createDefaultSlide', () => {
-    it('create new default slide without name', () => {
+    it('creates new default slide without name', () => {
         const id = 'slide1';
         const slide = createDefaultSlide(id);
         expect(slide).toEqual({
@@ -23,7 +23,7 @@ describe('createDefaultSlide', () => {
             notice: 'Введите текст для заметок',
                 })
     })
-    it('create deafault slide with name', () => {
+    it('creates deafault slide with name', () => {
         const id = 'slide1'
         const name = 'My Name'
 
@@ -33,7 +33,7 @@ describe('createDefaultSlide', () => {
 })
 
 describe('removeSlide', () => {
-    it('remove only one of one slide from presentation', () => {
+    it('removes only one of one slide from presentation', () => {
         const id = 'presentation1';
         const slide = createDefaultSlide(id);
         const created = new Date();
@@ -47,9 +47,8 @@ describe('removeSlide', () => {
         const result = removeSlide(presentation, id);
 
         expect(result.slides).toHaveLength(0);
-        expect(result.activeSlideId).toBe('');
     });
-    it('remove first slide and activate next slide', () => {
+    it('removes first slide and activate next slide', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
         const slide2 = createDefaultSlide('slide2', 'Слайд 2');
         const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
@@ -63,10 +62,9 @@ describe('removeSlide', () => {
 
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].id).toBe('slide2');
-        expect(result.activeSlideId).toBe('slide2');
     });
 
-    it('remove middle slide and activate next slide', () => {
+    it('removes middle slide and activate next slide', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
         const slide2 = createDefaultSlide('slide2', 'Слайд 2');
         const slide3 = createDefaultSlide('slide3', 'Слайд 3');
@@ -74,7 +72,6 @@ describe('removeSlide', () => {
         const presentationWithSlides = {
             ...presentation,
             slides: [slide1, slide2, slide3],
-            activeSlideId: 'slide2',
         };
 
         const result = removeSlide(presentationWithSlides, 'slide2');
@@ -82,9 +79,8 @@ describe('removeSlide', () => {
         expect(result.slides).toHaveLength(2);
         expect(result.slides[0].id).toBe('slide1');
         expect(result.slides[1].id).toBe('slide3');
-        expect(result.activeSlideId).toBe('slide3');
     });
-    it('remove last slide and activate previous slide', () => {
+    it('removes last slide and activate previous slide', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
         const slide2 = createDefaultSlide('slide2', 'Слайд 2');
         const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
@@ -98,10 +94,9 @@ describe('removeSlide', () => {
 
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].id).toBe('slide1');
-        expect(result.activeSlideId).toBe('slide1');
     });
 
-    it('remove inactive slide and keep active slide', () => {
+    it('removes inactive slide and keep active slide', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
         const slide2 = createDefaultSlide('slide2', 'Слайд 2');
         const slide3 = createDefaultSlide('slide3', 'Слайд 3');
@@ -115,10 +110,9 @@ describe('removeSlide', () => {
         const result = removeSlide(presentationWithSlides, 'slide2');
 
         expect(result.slides).toHaveLength(2);
-        expect(result.activeSlideId).toBe('slide1');
     });
 
-    it('return presentation if slide does not exist', () => {
+    it('returns presentation if slide does not exist', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
 
@@ -126,7 +120,6 @@ describe('removeSlide', () => {
 
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].id).toBe('slide1');
-        expect(result.activeSlideId).toBe('slide1');
     });
     it('does not mutate original presentation', () => {
         const slide1 = createDefaultSlide('slide1', 'Слайд 1');
@@ -135,7 +128,6 @@ describe('removeSlide', () => {
         const presentationWithSlides = {
             ...presentation,
             slides: [slide1, slide2],
-            activeSlideId: 'slide1',
         };
 
         removeSlide(presentationWithSlides, 'slide2');
@@ -143,13 +135,12 @@ describe('removeSlide', () => {
         expect(presentationWithSlides.slides).toHaveLength(2);
         expect(presentationWithSlides.slides[0].id).toBe('slide1');
         expect(presentationWithSlides.slides[1].id).toBe('slide2');
-        expect(presentationWithSlides.activeSlideId).toBe('slide1');
     });
 
 });
 
 describe('moveSlide', () => {
-    it('move slide to another position', () => {
+    it('moves slide to another position', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1')
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date())
         const presentation2 = addSlide(presentation, 'slide2');
@@ -161,7 +152,7 @@ describe('moveSlide', () => {
             'slide2'
         ])
     })
-    it('move last slide to first position', () => {
+    it('moves last slide to first position', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1')
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date())
         const presentation2 = addSlide(presentation, 'slide2')
@@ -175,7 +166,7 @@ describe('moveSlide', () => {
             'slide2'
         ])
     })
-    it('move middle slide to another position', () => {
+    it('moves middle slide to another position', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const presentation2 = addSlide(presentation, 'slide2');
@@ -189,7 +180,7 @@ describe('moveSlide', () => {
             'slide2'
         ]);
     });
-    it('move slide to the same position', () => {
+    it('moves slide to the same position', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const presentation2 = addSlide(presentation, 'slide2');
@@ -203,7 +194,7 @@ describe('moveSlide', () => {
             'slide3'
         ]);
     });
-    it('return presentation if slide does not exist', () => {
+    it('returns presentation if slide does not exist', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
 
@@ -232,7 +223,7 @@ describe('moveSlide', () => {
 })
 
 describe('duplicateSlide', () => {
-    it('duplicate first slide', () => {
+    it('duplicates first slide', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const presentation2 = addSlide(presentation, 'slide2');
@@ -246,7 +237,7 @@ describe('duplicateSlide', () => {
             'slide2'
         ]);
     });
-    it('duplicate middle slide', () => {
+    it('duplicates middle slide', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const presentation2 = addSlide(presentation, 'slide2');
@@ -263,7 +254,7 @@ describe('duplicateSlide', () => {
             'slide3'
         ]);
     });
-    it('duplicate last slide', () => {
+    it('duplicates last slide', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const presentation2 = addSlide(presentation, 'slide2');
@@ -281,7 +272,7 @@ describe('duplicateSlide', () => {
         ]);
     });
 
-    it('return presentation if slide does not exist', () => {
+    it('returns presentation if slide does not exist', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
         const presentation = createPresentation('My Pres', firstSlide, 'presentation1', new Date());
         const unknownSlide = createDefaultSlide('unknown', 'Unknown');

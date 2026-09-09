@@ -104,20 +104,15 @@ function removeObject(slide: Slide, objectId: string): Slide {
     };
 }
 
-function resizeObject(slide: Slide, objectId: string, size: Size ): Slide {
+function resizeObject(slide: Slide, objectId: string, size: Size): Slide {
     return {
         ...slide,
-        elements: slide.elements.map(element => {
-            if (element.id != objectId) {
-                return element
-            }
-            if (element.type === 'figure' && element.typeFigure === 'circle') {
-                return {...element, radius: size.width / 2}
-            }
-            return {...element, width: size.width, height: size.height}
-        })
-    }
+        elements: slide.elements.map(object => 
+            object.id === objectId ? { ...object, width: size.width, height: size.height } : object
+        )
+    };
 }
+
 
 function moveObject(slide: Slide, objectId: string, newX: number, newY: number): Slide {
     return {

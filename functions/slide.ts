@@ -1,8 +1,5 @@
 import type { Presentation } from "../types/presentation.js";
 import type { Slide as Slide } from "../types/slide.js";
-import { generateId } from "./utils.js"
-
-const id:string = generateId()
 
 function createDefaultSlide(id: string, name?: string): Slide {
     return {
@@ -21,58 +18,34 @@ function addSlide(presentation: Presentation, slideId: string, slideName?: strin
     return {
         ...presentation,
         slides: [...presentation.slides, newSlide],
-        activeSlideId: presentation.activeSlideId === '' ? slideId : presentation.activeSlideId
     };
 }
 
 function removeSlide(presentation: Presentation, id: string): Presentation {
-    const index:number = presentation.slides.findIndex(slide => slide.id === id);
-    if (index === -1) {
-        return presentation
-    }
-    let activeSlideId = presentation.activeSlideId;
-    if (presentation.activeSlideId === id) {
-        if (presentation.slides.length <= 1) {
-            activeSlideId = '';
-        } else if (index < presentation.slides.length - 1) {
-            activeSlideId = presentation.slides[index + 1].id;
-        } else {
-            activeSlideId = presentation.slides[index - 1].id;
-        }
-    }
     return {
         ...presentation,
-        slides: [...presentation.slides.slice(0, index), ...presentation.slides.slice(index + 1)],
-        activeSlideId
+        slides: presentation.slides.filter(slide => slide.id !== id)
+    }
+}
+
+function moveSlide(presentation: Presentation, slideId: string, newIndex: number): Presentation {
+    const targetSlide = presentation.slides.find(slide => slide.id === slideId);
+    if (!targetSlide) return presentation;
+
+    const otherSlides = presentation.slides.filter(slide => slide.id !== slideId);
+
+    return {
+        ...presentation,
+        slides: [
+            ...otherSlides.slice(0, newIndex),
+            targetSlide,
+            ...otherSlides.slice(newIndex)
+        ]
     };
 }
 
-function moveSlide(presentation: Presentation, id: string, newPosition: number): Presentation {
-    const index:number = presentation.slides.findIndex(slide => slide.id === id);
-    if (index === -1) {
-        return presentation
-    }
-    const slide:Slide = presentation.slides[index];
-    const newPresentation = removeSlide(presentation, id);
-    return {
-        ...newPresentation,
-        slides: [...newPresentation.slides.slice(0, newPosition), slide, ...newPresentation.slides.slice(newPosition)]
-    }
-}
-
-function setActiveSlide(presentation: Presentation, id: string): Presentation {
-    const slide:Slide|undefined = presentation.slides.find(slide => slide.id === id)
-    if (!slide) {
-        return presentation
-    }
-    return {
-        ...presentation,
-        activeSlideId: id
-    }
-}
 
 function duplicateSlide(presentation: Presentation, slide: Slide): Presentation {
-
     if (!slide) {
         return presentation;
     }
@@ -93,7 +66,6 @@ function duplicateSlide(presentation: Presentation, slide: Slide): Presentation 
 export {
     createDefaultSlide,
     duplicateSlide,
-    setActiveSlide,
     moveSlide,
     addSlide,
     removeSlide
