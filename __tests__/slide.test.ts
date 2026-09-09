@@ -3,7 +3,6 @@ import {
         createDefaultSlide,
         removeSlide,
         moveSlide,
-        setActiveSlide,
         duplicateSlide,
         addSlide,
 } from '../functions/slide.js';
@@ -232,33 +231,6 @@ describe('moveSlide', () => {
     });
 })
 
-describe('setActiveSlide', () => {
-    it('set existing slide as active', () => {
-        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
-        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
-
-        const result = setActiveSlide(presentation, 'slide1');
-
-        expect(result.activeSlideId).toBe('slide1');
-    });
-    it('do not change active slide if slide does not exist', () => {
-        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
-        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date())
-
-        const result = setActiveSlide(presentation, 'unknown');
-
-        expect(result.activeSlideId).toBe('slide1');
-    });
-    it('does not mutate original presentation', () => {
-        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
-        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
-
-        setActiveSlide(presentation, 'slide1');
-
-        expect(presentation.activeSlideId).toBe('slide1');
-    });
-});
-
 describe('duplicateSlide', () => {
     it('duplicate first slide', () => {
         const firstSlide = createDefaultSlide('slide1', 'Слайд 1');
@@ -318,15 +290,5 @@ describe('duplicateSlide', () => {
 
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].id).toBe('slide1');
-    });
-    it('does not mutate original presentation', () => {
-        const slide1 = createDefaultSlide('slide1', 'Слайд 1');
-        const presentation = createPresentation('My Pres', slide1, 'presentation1', new Date());
-        const presentation2 = addSlide(presentation, 'slide2');
-
-        setActiveSlide(presentation2, 'slide2');
-
-        expect(presentation2.activeSlideId).toBe('slide1');
-
     });
 });

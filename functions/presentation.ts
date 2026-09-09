@@ -1,11 +1,5 @@
-import type { Presentation as Presentation } from "../types/presentation.js";
-import type { Slide as Slide } from "../types/slide.js";
-import { generateId } from "./utils.js"
-import { createDefaultSlide } from "./slide.js";
-
-const id:string = generateId();
-const defaultSlide:Slide = createDefaultSlide(id);
-const created:Date = new Date();
+import type { Presentation } from "../types/presentation.js";
+import type { Slide } from "../types/slide.js";
 
 function createPresentation(name: string, defaultSlide: Slide, id: string, created: Date): Presentation {
     return {
@@ -34,7 +28,7 @@ function loadPresentation(json: string): Presentation {
     if (
         typeof presentation.id !== 'string' ||
         typeof presentation.name !== 'string' ||
-        !['access', 'public', 'linkedOnly'].includes(presentation.access) ||
+        !['private', 'public', 'linkedOnly'].includes(presentation.access) ||
         typeof presentation.created !== 'string' ||
         !Array.isArray(presentation.slides) ||
         typeof presentation.activeSlideId !== 'string'
