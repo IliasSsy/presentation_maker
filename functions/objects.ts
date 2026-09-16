@@ -78,7 +78,7 @@ function resizeObject(slide: Slide, objectId: string, size: Size): Slide {
     return {
         ...slide,
         elements: slide.elements.map(object => 
-            object.id === objectId ? { ...object, width: size.width, height: size.height } : object
+            object.id === objectId ? { ...object, size: { width: size.width, height: size.height } } : object
         )
     };
 }

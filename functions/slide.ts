@@ -1,5 +1,5 @@
 import type { Presentation } from "../types/presentation.js";
-import type { Slide as Slide } from "../types/slide.js";
+import type { Slide } from "../types/slide.js";
 
 function createDefaultSlide(id: string, name?: string): Slide {
     return {
