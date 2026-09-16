@@ -31,9 +31,7 @@ function removeSlide(presentation: Presentation, id: string): Presentation {
 function moveSlide(presentation: Presentation, slideId: string, newIndex: number): Presentation {
     const targetSlide = presentation.slides.find(slide => slide.id === slideId);
     if (!targetSlide) return presentation;
-
     const otherSlides = presentation.slides.filter(slide => slide.id !== slideId);
-
     return {
         ...presentation,
         slides: [
@@ -45,7 +43,7 @@ function moveSlide(presentation: Presentation, slideId: string, newIndex: number
 }
 
 
-function duplicateSlide(presentation: Presentation, slide: Slide): Presentation {
+function duplicateSlide(presentation: Presentation, slide: Slide, newSlideId: string): Presentation {
     if (!slide) {
         return presentation;
     }
@@ -53,12 +51,15 @@ function duplicateSlide(presentation: Presentation, slide: Slide): Presentation 
     if (index === -1) {
         return presentation;
     }
+    const originalSlide = presentation.slides[index]
+    const cloneSlide = structuredClone(originalSlide)
+    cloneSlide.id = newSlideId
     return {
         ...presentation,
         slides: [
-            ...presentation.slides.slice(0, index),
-            slide,
-            ...presentation.slides.slice(index)
+            ...presentation.slides.slice(0, index + 1),
+            cloneSlide,
+            ...presentation.slides.slice(index + 1)
         ]
     };
 }

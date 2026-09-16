@@ -1,14 +1,13 @@
 import type { Presentation } from "../types/presentation.js";
 import type { Slide } from "../types/slide.js";
 
-function createPresentation(name: string, defaultSlide: Slide, id: string, created: Date): Presentation {
+function createPresentation(name: string, id: string, created: Date): Presentation {
     return {
         id,
-        slides: [defaultSlide],
+        slides: [],
         name,
         access: 'linkedOnly',
         created,
-
     }
 }
 

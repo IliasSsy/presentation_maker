@@ -5,12 +5,16 @@ type Objects = {
     layer: number,
 }
 
-type TextObject = Objects & {
+type TextObject = Objects  & {
     type: 'text',
-    width: number,
-    height: number,
+    size: Size,
     content: string,
     style: TextStyle,
+}
+
+type Size = {
+    width: number,
+    height: number,
 }
 
 type Figure = Objects & {
@@ -19,11 +23,10 @@ type Figure = Objects & {
     borderColor: string,
 }
 
-type ImageObject = Objects & {
+type ImageObject = Objects &  {
     type: 'image',
+    size: Size,
     url: string,
-    width: number,
-    height: number,
 }
 
 type Point = {
@@ -48,18 +51,16 @@ type Circle = Figure & {
     fillColor: string,
 }
 
-type Rectangle = Figure & {
+type Rectangle = Figure  & {
     typeFigure: 'rectangle',
-    width: number,
-    height: number,
+    size: Size,
     fillColor: string,
 }
 
 type Triangle = Figure & {
     typeFigure: 'triangle',
+    size: Size,
     points: [Point, Point, Point],
-    width: number,
-    height: number,
     fillColor: string,
 }
 
@@ -67,4 +68,8 @@ type SlideObject = TextObject | ImageObject | Circle | Rectangle | Triangle;
 
 export {
     type SlideObject,
+    type TextStyle,
+    type TextObject,
+    type ImageObject,
+    type Size,
 }
