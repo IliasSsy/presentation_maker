@@ -1,6 +1,5 @@
 import type { Slide } from "../types/slide.js";
-import { generateId } from "./utils.js"
-import type { SlideObject, Size } from "../types/objects.js";
+import type { TextObject, ImageObject, Size } from "../types/objects.js";
 
 const DefaultVal:number = 0;
 
@@ -45,55 +44,26 @@ function clearSlideBackground(slide: Slide): Slide {
     }
 }
 
-function addTextObject(slide: Slide, content: string, x: number, y: number, width: number, height: number,
-                        fontFamily: string, fontSize: number, fontColor: string, objectId: string): Slide {
-        const textObject:SlideObject = {
-            id: objectId,
-            position: {x, y},
-            type: 'text',
-            layer: slide.elements.length,
-            content,
-            width,
-            height,
-            style: {
-                fontFamily,
-                fontSize,
-                fontColor,
-                bold: false,
-                italic: false,
-                underline: false,
-                fillColor: 'transparent',
-                textAlign: 'left'
-            }
-        }
-        return {
-            ...slide,
-            elements: [...slide.elements, textObject]
-    }
+function addTextObject(slide: Slide, object: TextObject): Slide {
+    return {
+        ...slide,
+        elements: [...slide.elements, object]
+    };
 }
 
-function addImageObject(slide: Slide, url: string, x: number, y: number, width: number, height: number, objectId: string): Slide {
-    const dot = url.lastIndexOf('.')
+function addImageObject(slide: Slide, object: ImageObject): Slide {
+    const dot = object.url.lastIndexOf('.')
     if (dot === -1) {
         return slide
     }
-    const format = url.slice(dot)
+    const format = object.url.slice(dot)
     const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif']
     if (!possibleArray.includes(format)) {
         return slide
     }
-    const imageObject:SlideObject = {
-        id: objectId,
-        position: {x, y},
-        type: 'image',
-        layer: slide.elements.length,
-        width,
-        height,
-        url,
-    }
     return {
         ...slide,
-        elements: [...slide.elements, imageObject]
+        elements: [...slide.elements, object]
     }
 }
 
