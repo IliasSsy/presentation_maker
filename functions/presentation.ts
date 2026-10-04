@@ -1,5 +1,4 @@
 import type { Presentation } from "../types/presentation.js";
-import type { Slide } from "../types/slide.js";
 
 function createPresentation(name: string, id: string, created: Date): Presentation {
     return {
