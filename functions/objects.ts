@@ -47,7 +47,8 @@ function clearSlideBackground(slide: Slide): Slide {
 }
 
 function addTextObject(slide: Slide, object: TextObject): Slide {
-    return { ...slide, elements: [...slide.elements, object] };
+    return { ...slide, 
+        elements: [...(slide.elements || []), object] };
 }
 
 function addImageObject(slide: Slide, object: ImageObject): Slide {

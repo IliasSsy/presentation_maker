@@ -1,43 +1,39 @@
 import type { Presentation } from "../../../types/presentation.js";
-
-let currentPresentation:Presentation | null = null
+// презентацию + actionId тут
+let currentPresentation: Presentation | null = null;
 
 function setInitialState(presentation: Presentation): void {
-    currentPresentation = presentation
+    currentPresentation = presentation;
 }
 
-function getState(): Presentation| null {
-    return currentPresentation
+function getState(): Presentation | null {
+    return currentPresentation;
 }
 
-type Modifier<P = any> = (model: Presentation, params: P) => Presentation;
+type Modifier = (model: Presentation, ...args: any[]) => Presentation;
 
-let modifierParams: any = null;
-
-function dispatch(modifier: Modifier, params: any = null): void {
+function dispatch(modifier: Modifier, ...args: any[]): void {
   if (!currentPresentation) {
     console.error('State is not initialized! Call setInitialState first.');
     return;
   }
 
-  modifierParams = params;
-  currentPresentation = modifier(currentPresentation, params);
+  currentPresentation = modifier(currentPresentation, ...args);
 
   if (editorChangeHandler) {
     editorChangeHandler();
   }
 }
 
-let editorChangeHandler: (() => void) | null = null
+let editorChangeHandler: (() => void) | null = null;
 
 function addEditorChangeHandler(handler: () => void): void {
-    editorChangeHandler = handler
+    editorChangeHandler = handler;
 }
-
 
 export {
     dispatch,
     setInitialState,
     getState,
     addEditorChangeHandler
-}
+};

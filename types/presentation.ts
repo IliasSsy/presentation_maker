@@ -6,6 +6,7 @@ type Presentation = {
     access: "private" | "public" | "linkedOnly";
     created: Date;
     slides: Slide[];
+    activeSlideId?: string;
 }
 
 export { 
