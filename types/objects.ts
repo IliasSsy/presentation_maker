@@ -72,4 +72,5 @@ export {
     type TextObject,
     type ImageObject,
     type Size,
+    type Point,
 }

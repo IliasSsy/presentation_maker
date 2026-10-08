@@ -1,70 +1,59 @@
 import type { Slide } from "../types/slide.js";
 import type { TextObject, ImageObject, Size } from "../types/objects.js";
+import type { SlideObject } from "../types/objects.js";
 
-const DefaultVal:number = 0;
+const DEAFULT_VALUE: number = 0;
 
-function setSlideBackgroundColor(slide: Slide, color: string): Slide {
-    if (!color) {
-        return slide
-    }
-    return {
-        ...slide,
-        background: {type: 'color', color}
-    }
-}
-
-function setSlideBackgroundImage(slide: Slide, url: string): Slide {
-    const dot = url.lastIndexOf('.')
+function isValidImageUrl(url: string): boolean {
+    const dot = url.lastIndexOf('.');
     if (dot === -1) {
-        return slide
+        return false;
     }
-    const format = url.slice(dot)
-    const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif']
-    if (!possibleArray.includes(format)) {
-        return slide
-    }
-    return {
-        ...slide,
-        background: {type: 'image', url}
-    }
+    const format = url.slice(dot);
+    const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif'];
+    return possibleArray.includes(format);
 }
 
-function setSlideBackgroundGradient(slide: Slide, colors: string[], angle?: number): Slide {
-    angle = angle ?? DefaultVal;
+function modifyObject(slide: Slide, objectId: string, payload: Partial<SlideObject>): Slide {
     return {
         ...slide,
-        background: {type: 'gradient', colors, angle}
-    }
-}
-
-function clearSlideBackground(slide: Slide): Slide {
-    return {
-        ...slide,
-        background: {type: 'none'}
-    }
-}
-
-function addTextObject(slide: Slide, object: TextObject): Slide {
-    return {
-        ...slide,
-        elements: [...slide.elements, object]
+        elements: slide.elements.map(element => {
+            if (element.id !== objectId) return element;
+            return {
+                ...element,
+                ...payload,
+            } as SlideObject;
+        })
     };
 }
 
+function setSlideBackgroundColor(slide: Slide, color: string): Slide {
+    if (!color) return slide;
+    return { ...slide, background: { type: 'color', color } };
+}
+
+function setSlideBackgroundImage(slide: Slide, url: string): Slide {
+    if (!isValidImageUrl(url)) return slide;
+    return { ...slide, background: { type: 'image', url } };
+}
+
+function setSlideBackgroundGradient(slide: Slide, colors: string[], angle?: number): Slide {
+    angle = angle ?? DEAFULT_VALUE;
+    return { ...slide, background: { type: 'gradient', colors, angle } };
+}
+
+function clearSlideBackground(slide: Slide): Slide {
+    return { ...slide, background: { type: 'none' } };
+}
+
+function addTextObject(slide: Slide, object: TextObject): Slide {
+    return { ...slide, 
+        elements: [...(slide.elements || []), object] };
+}
+
 function addImageObject(slide: Slide, object: ImageObject): Slide {
-    const dot = object.url.lastIndexOf('.')
-    if (dot === -1) {
-        return slide
-    }
-    const format = object.url.slice(dot)
-    const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif']
-    if (!possibleArray.includes(format)) {
-        return slide
-    }
-    return {
-        ...slide,
-        elements: [...slide.elements, object]
-    }
+    if (!isValidImageUrl(object.url)) return slide;
+    return { ...slide, elements: [...slide.elements, object] };
 }
 
 function removeObject(slide: Slide, objectId: string): Slide {
@@ -75,37 +64,17 @@ function removeObject(slide: Slide, objectId: string): Slide {
 }
 
 function resizeObject(slide: Slide, objectId: string, size: Size): Slide {
-    return {
-        ...slide,
-        elements: slide.elements.map(object => 
-            object.id === objectId ? { ...object, size: { width: size.width, height: size.height } } : object
-        )
-    };
+    return modifyObject(slide, objectId, { size });
 }
 
-
 function moveObject(slide: Slide, objectId: string, newX: number, newY: number): Slide {
-    return {
-        ...slide,
-        elements: slide.elements.map(element => 
-            element.id === objectId ? {...element, position: {x: newX, y: newY}} : element
-        )
-    }
+    return modifyObject(slide, objectId, { position: { x: newX, y: newY } });
 }
 
 function updateTextObjectStyle(slide: Slide, objectId: string, fontFamily: string, fontSize: number, fontColor: string): Slide {
-    return {
-        ...slide,
-        elements: slide.elements.map(element => {
-            if (element.id !== objectId || element.type !== 'text') {
-                return element
-            }
-            return {
-                ...element,
-                style: {...element.style, fontFamily, fontColor, fontSize}
-            }
-        })
-    }
+    return modifyObject(slide, objectId, {
+        style: { fontFamily, fontColor, fontSize }
+    } as Partial<TextObject>); 
 }
 
 export {
@@ -118,5 +87,5 @@ export {
     removeObject,
     resizeObject,
     moveObject,
-    updateTextObjectStyle
-}
+    updateTextObjectStyle,
+};
