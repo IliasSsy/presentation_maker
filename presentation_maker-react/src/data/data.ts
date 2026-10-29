@@ -39,9 +39,10 @@ function createDefaultTextObject(
 }
 
 function createTestPresentation(): Presentation {
-    const presId = generateId();
+const presId = generateId();
     let presentation: Presentation = createPresentation('Тестовая презентация', presId, new Date());
-
+    const firstSlideId = generateId();
+    presentation = addSlide(presentation, firstSlideId);
     let slide1 = presentation.slides[0];
     slide1 = setSlideBackgroundColor(slide1, '#f0f0f0');
     slide1 = addTextObject(slide1, createDefaultTextObject('Доброе пожаловать', { x: 50, y: 50 }, { width: 400, height: 60 }, { fontSize: 32 }));

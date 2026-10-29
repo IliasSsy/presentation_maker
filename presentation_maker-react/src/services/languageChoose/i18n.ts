@@ -66,9 +66,18 @@ function getCurrentLang(): Lang {
     return (saved === 'en' || saved === 'ru') ? saved : 'en';
 }
 
-function setLang(lang: Lang) {
+let langChangeHandler: (() => void) | null = null;
+
+function addLangChangeHandler(handler: () => void): void {
+    langChangeHandler = handler;
+}
+
+function setLang(lang: Lang): void {
     localStorage.setItem('app_lang', lang);
-    window.location.reload();
+    
+    if (langChangeHandler) {
+        langChangeHandler();
+    }
 }
 
 function translate(key: string): string {
@@ -80,5 +89,11 @@ function translate(key: string): string {
     return item[currentLang] || item.ru || key;
 }
 
-export { dictionary, getCurrentLang, setLang, translate };
-export type {Lang}
+export { 
+    dictionary, 
+    getCurrentLang, 
+    setLang, 
+    translate, 
+    addLangChangeHandler 
+};
+export type { Lang };

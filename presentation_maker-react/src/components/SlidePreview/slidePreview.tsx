@@ -1,41 +1,29 @@
 import type { Slide } from "../../../../types/slide";
-import { SlideObjectComp } from "../SlideObject/slideObject";
+import { SlideObjectComp } from "../slideObject/SlideObject";
 import styles from "./slidePreview.module.css";
+import { getBackgroundStyle } from "../../modules/editor";
 
-interface SlidePreviewProps {
+type SlidePreviewProps = {
     slide: Slide;
+    selectedIds: string[];
+    onObjectClick: (e: React.MouseEvent, objectId: string) => void;
+    onBackgroundClick?: (e: React.MouseEvent) => void; 
 }
 
-function SlidePreview({ slide }: SlidePreviewProps) {
-    const getBackgroundStyle = () => {
-        const backgroundSlide = slide.background;
-        if (!backgroundSlide || backgroundSlide.type === "none") {
-            return { backgroundColor: "#ffffff" };
-        }
-        if (backgroundSlide.type === "color") {
-            return { backgroundColor: backgroundSlide.color };
-        }
-        if (backgroundSlide.type === "image") {
-            return { 
-                backgroundImage: `url(${backgroundSlide.url})`, 
-                backgroundSize: "cover",
-                backgroundPosition: "center"
-            };
-        }
-        if (backgroundSlide.type === "gradient") {
-            const angle = backgroundSlide.angle ?? 0;
-            const colorsString = backgroundSlide.colors.join(", ");
-            return {
-                background: `linear-gradient(${angle}deg, ${colorsString})`
-            };
-        }
-        return { backgroundColor: "#ffffff" };
-    };
-
+function SlidePreview({slide, selectedIds = [], onObjectClick, onBackgroundClick}: SlidePreviewProps) {
     return (
-        <div className={styles.slide} style={getBackgroundStyle()}>
+        <div 
+            className={styles.slide} 
+            style={getBackgroundStyle(slide.background)}
+            onClick={onBackgroundClick} 
+        >
             {slide.elements.map((element) => (
-                <SlideObjectComp key={element.id} object={element} />
+                <SlideObjectComp 
+                    key={element.id} 
+                    object={element} 
+                    isSelected={selectedIds.includes(element.id)}
+                    onClick={(event) => onObjectClick && onObjectClick(event, element.id)}
+                />
             ))}
         </div>
     );

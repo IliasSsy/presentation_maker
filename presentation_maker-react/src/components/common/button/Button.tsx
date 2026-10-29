@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
 import styles from "./button.module.css"
-import { translate } from "../../../services/languageChoose/i18n";
+import { translate } from "../../../services/LanguageChoose/i18n";
 
-interface ToolbarButtonProps {
+type ToolbarButtonProps = {
     children: ReactNode;
     tooltipKey: string;
     onClick: () => void;
     className?: string;
 }
 
-function ToolbarButton({ children, tooltipKey, onClick, className = '' }: ToolbarButtonProps) {
+function Button({ children, tooltipKey, onClick, className = '' }: ToolbarButtonProps) {
     return (
         <div className={`${styles.wrapper} ${className}`}>
             <button onClick={onClick} className={styles.button} type="button">
@@ -20,4 +20,4 @@ function ToolbarButton({ children, tooltipKey, onClick, className = '' }: Toolba
     );
 }
 
-export {ToolbarButton}
+export  {Button}

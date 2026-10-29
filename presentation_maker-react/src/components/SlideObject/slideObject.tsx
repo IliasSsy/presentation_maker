@@ -1,20 +1,26 @@
 import type { SlideObject } from "../../../../types/objects";
+import React from "react";
 
-interface SlideObjectProps {
+type SlideObjectProps = {
     object: SlideObject;
+    isSelected?: boolean; 
+    onClick?: (e: React.MouseEvent) => void; 
 }
 
-function SlideObjectComp({ object }: SlideObjectProps) {
-    const baseStyle = {
-        position: 'absolute' as const,
+function SlideObjectComp({ object, isSelected, onClick }: SlideObjectProps) {
+    const baseStyle: React.CSSProperties = {
+        position: 'absolute',
         left: `${object.position.x}px`,
         top: `${object.position.y}px`,
         zIndex: object.layer,
+        outline: isSelected ? '2px solid #0b99ff' : 'none',
+        cursor: onClick ? 'pointer' : 'default', 
     };
     if (object.type === 'text') {
         const { size, content, style } = object;
         return (
             <div
+                onClick={onClick} 
                 style={{
                     ...baseStyle,
                     width: `${size.width}px`,
@@ -35,10 +41,12 @@ function SlideObjectComp({ object }: SlideObjectProps) {
             </div>
         );
     }
+    
     if (object.type === 'image') {
         const { size, url } = object;
         return (
             <div
+                onClick={onClick} 
                 style={{
                     ...baseStyle,
                     width: `${size.width}px`,
@@ -59,6 +67,7 @@ function SlideObjectComp({ object }: SlideObjectProps) {
             const { size, fillColor, borderColor } = object;
             return (
                 <div
+                    onClick={onClick} 
                     style={{
                         ...baseStyle,
                         width: `${size.width}px`,
@@ -74,6 +83,7 @@ function SlideObjectComp({ object }: SlideObjectProps) {
             const diameter = radius * 2;
             return (
                 <div
+                    onClick={onClick} 
                     style={{
                         ...baseStyle,
                         width: `${diameter}px`,
@@ -90,6 +100,7 @@ function SlideObjectComp({ object }: SlideObjectProps) {
             const pointsString = points.map(p => `${p.x},${p.y}`).join(' ');
             return (
                 <svg
+                    onClick={onClick} 
                     style={{
                         ...baseStyle,
                         width: `${size.width}px`,
