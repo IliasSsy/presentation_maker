@@ -8,15 +8,25 @@ type WorkspaceProps = {
 }
 
 function Workspace({ activeSlide }: WorkspaceProps) {
-    const { 
-        activeObjectIds, 
-        handleObjectClick, 
-        handleBackgroundClick 
-    } = useSelection();
+    const { activeObjectIds, handleObjectClick, handleBackgroundClick } = useSelection();
     return (
         <div className={styles.workspaceContainer}>
-            <div className={styles.canvasArea}>
-                <div className={styles.canvasWrapper}>
+            <div 
+                className={styles.canvasArea} 
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                        handleBackgroundClick();
+                    }
+                }}
+            >
+                <div 
+                    className={styles.canvasWrapper}
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            handleBackgroundClick();
+                        }
+                    }}
+                >
                     <SlidePreview 
                         slide={activeSlide} 
                         selectedIds={activeObjectIds}
@@ -26,11 +36,7 @@ function Workspace({ activeSlide }: WorkspaceProps) {
                 </div>
             </div>
             <div className={styles.speakerNotesContainer}>
-                <textarea
-                    className={styles.speakerNotesInput}
-                    placeholder="Нажмите, чтобы ввести заметки"
-                    rows={2}
-                />
+                <textarea className={styles.speakerNotesInput} placeholder="Нажмите, чтобы ввести заметки" rows={2} />
             </div>
         </div>
     );

@@ -7,15 +7,15 @@ function useDragAndDrop(onDrop: (delta: Point) => void) {
     const [draggedObjectIds, setDraggedObjectIds] = useState<string[]>([]);
     const startMousePosition = useRef<Point>({ x: 0, y: 0 });
     const handleMouseDown = (event: React.MouseEvent, objectIds: string[]) => {
-        event.stopPropagation();
         setIsDragging(true);
         setDraggedObjectIds(objectIds);
         startMousePosition.current = { x: event.clientX, y: event.clientY };
         setDragOffset({ x: 0, y: 0 }); 
     };
-
     useEffect(() => {
-        if (!isDragging) return;
+        if (!isDragging) {
+            return;
+        }
         const getDelta = (clientX: number, clientY: number) => ({
             x: clientX - startMousePosition.current.x,
             y: clientY - startMousePosition.current.y

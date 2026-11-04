@@ -6,42 +6,45 @@ function useSelection() {
     const state = getState();
     const activeSlideId = state?.activeSlideId;
     const [activeObjectIds, setActiveObjectIds] = useState<string[]>([]);
+    
     useEffect(() => {
         setActiveObjectIds([]);
     }, [activeSlideId]);
+
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Delete' || e.key === 'Backspace') {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Delete' || event.key === 'Backspace') {
                 if (activeObjectIds.length > 0) {
-                    dispatch(removeSelectedObjectsModifier, activeObjectIds)    
-                    setActiveObjectIds([])
+                    dispatch(removeSelectedObjectsModifier, activeObjectIds);    
+                    setActiveObjectIds([]);
                 }
             }
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
-        };
+        }; 
     }, [activeObjectIds]); 
+
     function handleObjectClick(event: React.MouseEvent, objectId: string) {
         event.preventDefault();
         if (event.shiftKey) {
-            setActiveObjectIds((prev) => {
-                if (prev.includes(objectId)) {
-                    return prev.filter((id) => id !== objectId);
+            setActiveObjectIds((oldIds) => {
+                if (oldIds.includes(objectId)) {
+                    return oldIds.filter((id) => id !== objectId);
                 } else {
-                    return [...prev, objectId];
+                    return [...oldIds, objectId];
                 }
             });
         } else {
             setActiveObjectIds([objectId]);
         }
     }
-    function handleBackgroundClick(event: React.MouseEvent) {
-        if (event.target === event.currentTarget) {
-            setActiveObjectIds([]); 
-        }
+
+    function handleBackgroundClick() {
+        setActiveObjectIds([]); 
     }
+
     return {
         activeObjectIds,
         handleObjectClick,
@@ -49,4 +52,4 @@ function useSelection() {
     };
 }
 
-export { useSelection }
+export { useSelection };

@@ -2,7 +2,7 @@ import type { EditorState } from "./editor";
 import type { Slide } from "../../../types/slide";
 import type { Point } from "../../../types/objects";
 import { generateId } from "../../../functions/utils";
-import { removeObject, moveObject, resizeObject } from "../../../functions/objects";
+import { removeObject, moveObject } from "../../../functions/objects";
 
 function changePresentationTitle(state: EditorState, newName: string): EditorState {
     return {

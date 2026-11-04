@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react'; // Библиотеки имулирующие браузерное окружение HappyDOM
 import { useSelection } from '../src/components/workspace/hooks/useSelection'
 
 describe('useSelection', () => {
@@ -30,7 +30,7 @@ describe('useSelection', () => {
         const clickEvent = { preventDefault: () => {}, shiftKey: false } as unknown as React.MouseEvent;
         const backgroundEvent = { target: 'background', currentTarget: 'background' } as unknown as React.MouseEvent; 
         act(() => result.current.handleObjectClick(clickEvent, 'obj1'));
-        act(() => result.current.handleBackgroundClick(backgroundEvent));
+        act(() => result.current.handleBackgroundClick());
         expect(result.current.activeObjectIds).toEqual([]);
     });
 });
