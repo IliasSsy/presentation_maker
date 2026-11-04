@@ -20,6 +20,30 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
         }
     });
     const clickStartPos = useRef({ x: 0, y: 0 });
+    let groupBoundingBox = null;
+    
+    if (selectedIds.length > 1) {
+        const selectedElements = (slide.elements || []).filter(element => selectedIds.includes(element.id));
+        const isGroupDragging = isDragging && draggedObjectIds.some(id => selectedIds.includes(id));
+        const minX = Math.min(...selectedElements.map(element => element.position.x));
+        const minY = Math.min(...selectedElements.map(element => element.position.y));
+        const maxX = Math.max(...selectedElements.map(element => {
+            const width = 'size' in element ? element.size.width : element.radius * 2;
+            return element.position.x + width;
+        }));
+        const maxY = Math.max(...selectedElements.map(element => {
+            const height = 'size' in element ? element.size.height : element.radius * 2;
+            return element.position.y + height;
+        }));
+        
+        groupBoundingBox = {
+            x: minX + (isGroupDragging ? dragOffset.x : 0),
+            y: minY + (isGroupDragging ? dragOffset.y : 0),
+            width: maxX - minX,
+            height: maxY - minY,
+        };
+    }
+
     return (
         <div 
             id="slide-background" 
@@ -38,12 +62,13 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                     x: element.position.x + (isMoving ? dragOffset.x : 0),
                     y: element.position.y + (isMoving ? dragOffset.y : 0)
                 };
+                const showIndividualSelection = isSelected && selectedIds.length === 1;
                 return (
                     <SlideObjectComp 
                         key={element.id}    
                         object={element}
                         position={currentPosition} 
-                        isSelected={isSelected}
+                        isSelected={showIndividualSelection}
                         onClick={(event) => {
                             const dx = Math.abs(event.clientX - clickStartPos.current.x);
                             const dy = Math.abs(event.clientY - clickStartPos.current.y);
@@ -60,6 +85,24 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                     />
                 );
             })}
+            {groupBoundingBox && (
+                <div 
+                    style={{
+                        position: 'absolute',
+                        left: `${groupBoundingBox.x}px`,
+                        top: `${groupBoundingBox.y}px`,
+                        width: `${groupBoundingBox.width}px`,
+                        height: `${groupBoundingBox.height}px`,
+                        outline: '1px solid #0b99ff',
+                        cursor: isDragging ? 'grabbing' : 'grab', 
+                        zIndex: 5, 
+                        backgroundColor: 'transparent', 
+                    }}
+                    onMouseDown={(event) => {
+                        handleMouseDown(event, selectedIds);
+                    }}
+                />
+            )}
         </div>
     );
 }
