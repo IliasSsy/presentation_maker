@@ -39,7 +39,6 @@ function useDragAndDrop(onDrop: (delta: Point) => void) {
             document.removeEventListener("mouseup", onMouseUp);
         };
     }, [isDragging, onDrop]);        
-
     return { 
         dragOffset, 
         isDragging, 

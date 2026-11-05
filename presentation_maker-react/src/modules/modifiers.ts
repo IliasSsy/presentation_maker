@@ -1,8 +1,8 @@
 import type { EditorState } from "./editor";
 import type { Slide } from "../../../types/slide";
-import type { Point } from "../../../types/objects";
+import type { Point, SlideObject } from "../../../types/objects";
 import { generateId } from "../../../functions/utils";
-import { removeObject, moveObject } from "../../../functions/objects";
+import { removeObject, moveObject, resizeObject } from "../../../functions/objects";
 
 function changePresentationTitle(state: EditorState, newName: string): EditorState {
     return {
@@ -145,6 +145,69 @@ function removeSelectedObjectsModifier(state: EditorState, selectObjectIds: stri
     }
 }
 
+
+function updateSingleElement(slide: Slide, element: SlideObject, updatedObject: SlideObject): Slide {
+    if (updatedObject.type === 'text' && element.type === 'text') {
+        return resizeObject(slide, element.id, {
+            position: { ...updatedObject.position },
+            size: { ...updatedObject.size },
+            style: { ...element.style, ...updatedObject.style }
+        });
+    }
+    if (updatedObject.type === 'image' && element.type === 'image') {
+        return resizeObject(slide, element.id, {
+            position: { ...updatedObject.position },
+            size: { ...updatedObject.size }
+        });
+    }
+    if (updatedObject.type === 'figure' && element.type === 'figure') {
+        if (updatedObject.typeFigure === 'circle' && element.typeFigure === 'circle') {
+            return resizeObject(slide, element.id, {
+                position: { ...updatedObject.position },
+                radius: updatedObject.radius
+            });
+        }
+        if (
+            (updatedObject.typeFigure === 'rectangle' && element.typeFigure === 'rectangle') ||
+            (updatedObject.typeFigure === 'triangle' && element.typeFigure === 'triangle')
+        ) {
+            return resizeObject(slide, element.id, {
+                position: { ...updatedObject.position },
+                size: { ...updatedObject.size }
+            });
+        }
+    }
+    return resizeObject(slide, element.id, {
+        position: { ...updatedObject.position }
+    });
+}
+
+function resizeSelectedObjectsModifier(state: EditorState, activeSlideId: string, newObjects: SlideObject[]): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(
+        slide => slide.id === activeSlideId
+    );
+    if (slideIndex === -1) {
+        return state;
+    }
+    let updatedSlide = state.presentation.slides[slideIndex];
+    newObjects.forEach(updatedObject => {
+        const originalElement = updatedSlide.elements.find(obj => obj.id === updatedObject.id);
+        if (originalElement) {
+            updatedSlide = updateSingleElement(updatedSlide, originalElement, updatedObject);
+        }
+    });
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+    return {
+        ...state,
+        presentation: {
+            ...state.presentation,
+            slides: newSlides
+        }
+    };
+}
+
+
 export {
     deleteSlideModifier,
     addSlideModifier,
@@ -155,5 +218,6 @@ export {
     nextSlideModifier,
     setPreviewModeModifier,
     removeSelectedObjectsModifier,
-    moveSelectedObjectsModifier
+    moveSelectedObjectsModifier,
+    resizeSelectedObjectsModifier
 };

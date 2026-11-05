@@ -13,16 +13,16 @@ function Workspace({ activeSlide }: WorkspaceProps) {
         <div className={styles.workspaceContainer}>
             <div 
                 className={styles.canvasArea} 
-                onClick={(e) => {
-                    if (e.target === e.currentTarget) {
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) {
                         handleBackgroundClick();
                     }
                 }}
             >
                 <div 
                     className={styles.canvasWrapper}
-                    onClick={(e) => {
-                        if (e.target === e.currentTarget) {
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
                             handleBackgroundClick();
                         }
                     }}

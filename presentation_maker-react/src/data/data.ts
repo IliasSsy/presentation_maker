@@ -45,7 +45,7 @@ const presId = generateId();
     presentation = addSlide(presentation, firstSlideId);
     let slide1 = presentation.slides[0];
     slide1 = setSlideBackgroundColor(slide1, '#f0f0f0');
-    slide1 = addTextObject(slide1, createDefaultTextObject('Доброе пожаловать', { x: 50, y: 50 }, { width: 400, height: 60 }, { fontSize: 32 }));
+    slide1 = addTextObject(slide1, createDefaultTextObject('Добро пожаловать', { x: 50, y: 50 }, { width: 400, height: 60 }, { fontSize: 32 }));
     slide1 = addTextObject(slide1, createDefaultTextObject('Лабораторная работа #2', { x: 50, y: 120 }, { width: 400, height: 40 }, { fontSize: 20, fontColor: '#666666' }));
     
     presentation = {
