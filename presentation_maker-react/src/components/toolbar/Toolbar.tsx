@@ -8,6 +8,7 @@ import { dispatch } from "../../modules/editor.js";
 import { ToolbarButton } from "./toolbarButton/ToolbarButton.tsx";
 import { changePresentationTitle } from "../../modules/modifiers.js";
 import { startPreviewModifier } from "../../modules/modifiers.js";
+import { useImageUpload } from "./hooks/useImageUpload.ts";
 import type { DropListOption } from "../common/dropList/DropList.js";
 import arrowIcon from "./icons/arrow.svg";
 import prevIcon from "./icons/undo.svg";
@@ -43,6 +44,7 @@ function Toolbar({ presentation }: ToolbarProps) {
         { tooltip: "textButton", icon: textIcon },
         { tooltip: "shapesButton", icon: shapeIcon },
     ];
+    const { fileInputRef, handleFileChange, triggerUpload } = useImageUpload();
     return (
         <div className={styles.toolbar}>
             <div className={styles.group}>
@@ -74,6 +76,16 @@ function Toolbar({ presentation }: ToolbarProps) {
                 {insertTools.map((tool) => (
                     <ToolbarButton key={tool.tooltip} tooltipKey={tool.tooltip} icon={tool.icon} />
                 ))}
+                <Button tooltipKey="addImage" onClick={triggerUpload}>
+                    IMG
+                </Button>
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    style={{ display: 'none' }} 
+                />
             </div>
             <div className={styles.divider} />
             <div className={styles.group}>

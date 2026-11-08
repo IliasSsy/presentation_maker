@@ -3,15 +3,6 @@ import type { TextObject, ImageObject, SlideObject} from "../types/objects.js";
 
 const DEAFULT_VALUE: number = 0;
 
-function isValidImageUrl(url: string): boolean {
-    const dot = url.lastIndexOf('.');
-    if (dot === -1) {
-        return false;
-    }
-    const format = url.slice(dot);
-    const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif'];
-    return possibleArray.includes(format);
-}
 
 function modifyObject(slide: Slide, objectId: string, payload: Partial<SlideObject>): Slide {
     return {
@@ -32,7 +23,6 @@ function setSlideBackgroundColor(slide: Slide, color: string): Slide {
 }
 
 function setSlideBackgroundImage(slide: Slide, url: string): Slide {
-    if (!isValidImageUrl(url)) return slide;
     return { ...slide, background: { type: 'image', url } };
 }
 
@@ -51,7 +41,6 @@ function addTextObject(slide: Slide, object: TextObject): Slide {
 }
 
 function addImageObject(slide: Slide, object: ImageObject): Slide {
-    if (!isValidImageUrl(object.url)) return slide;
     return { ...slide, elements: [...slide.elements, object] };
 }
 

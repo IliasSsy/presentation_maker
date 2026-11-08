@@ -18,6 +18,13 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
         userSelect: 'none', 
     };
 
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (e.button !== 0) return; 
+        if (onMouseDown) {
+            onMouseDown(e);
+        }
+    };
+
     if (object.type === 'text') {
         const { size, content, style } = object;
         return (
@@ -25,7 +32,7 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
                 id={object.id}
                 draggable={false} 
                 onClick={onClick} 
-                onMouseDown={onMouseDown} 
+                onMouseDown={handleMouseDown} 
                 style={{
                     ...baseStyle,
                     width: `${size.width}px`,
@@ -54,7 +61,7 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
                 id={object.id}
                 draggable={false} 
                 onClick={onClick} 
-                onMouseDown={onMouseDown} 
+                onMouseDown={handleMouseDown} 
                 style={{
                     ...baseStyle,
                     width: `${size.width}px`,
@@ -70,20 +77,20 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
         if (object.typeFigure === 'rectangle') {
             const { size, fillColor, borderColor } = object;
             return (
-                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={onMouseDown} style={{ ...baseStyle, width: `${size.width}px`, height: `${size.height}px`, backgroundColor: fillColor, border: `1px solid ${borderColor}` }} />
+                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={handleMouseDown} style={{ ...baseStyle, width: `${size.width}px`, height: `${size.height}px`, backgroundColor: fillColor, border: `1px solid ${borderColor}` }} />
             );
         }
         if (object.typeFigure === 'circle') {
             const { radius, fillColor, borderColor } = object;
             return (
-                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={onMouseDown} style={{ ...baseStyle, width: `${radius * 2}px`, height: `${radius * 2}px`, backgroundColor: fillColor, border: `1px solid ${borderColor}`, borderRadius: '50%' }} />
+                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={handleMouseDown} style={{ ...baseStyle, width: `${radius * 2}px`, height: `${radius * 2}px`, backgroundColor: fillColor, border: `1px solid ${borderColor}`, borderRadius: '50%' }} />
             );
         }    
         if (object.typeFigure === 'triangle') {
             const { size, fillColor, borderColor, points } = object;
             const pointsString = points.map(p => `${p.x},${p.y}`).join(' ');
             return (
-                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={onMouseDown} style={{ ...baseStyle, width: `${size.width}px`, height: `${size.height}px` }}>
+                <div id={object.id} draggable={false} onClick={onClick} onMouseDown={handleMouseDown} style={{ ...baseStyle, width: `${size.width}px`, height: `${size.height}px` }}>
                     <svg style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                         <polygon points={pointsString} fill={fillColor} stroke={borderColor} strokeWidth="1" />
                     </svg>

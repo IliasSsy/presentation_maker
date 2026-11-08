@@ -1,6 +1,5 @@
 import { SlidePreview } from "../slidePreview/SlidePreview";
 import type { Presentation } from "../../../../types/presentation";
-import { getBackgroundStyle } from "../../modules/editor";
 import { getState, dispatch } from "../../modules/editor";
 import { nextSlideModifier, prevSlideModifier } from "../../modules/modifiers";
 import styles from "./PreviewOverlay.module.css";
@@ -31,7 +30,6 @@ function PreviewOverlay({ presentation, onClose }: PreviewModProps) {
             <div className={styles.slideContainer}>
                 <div 
                     className={styles.slideWrapper} 
-                    style={getBackgroundStyle(currentSlide.background)}
                 >
                     <SlidePreview slide={currentSlide} />
                 </div>

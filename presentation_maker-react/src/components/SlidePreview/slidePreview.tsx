@@ -73,6 +73,9 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
             id="slide-background" 
             className={styles.slidePreview} 
             onMouseDown={(event) => {
+                if (event.button !== 0) {
+                    return
+                }
                 const target = event.target as HTMLElement;
                 if (target.id === 'slide-background') {
                     onBackgroundClick(event);
@@ -130,6 +133,7 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                         backgroundColor: 'transparent', 
                     }}
                     onMouseDown={(event) => {
+                        if (event.button !== 0) return
                         const target = event.target as HTMLElement;
                         const resizeDirection = target.dataset.resize as ResizeDirection;
                         if (resizeDirection && selectionBox) {

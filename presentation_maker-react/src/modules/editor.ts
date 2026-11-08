@@ -1,5 +1,4 @@
 import type { Presentation } from "../../../types/presentation.js";
-import type { Background } from "../../../types/slide.js";
 
 type EditorState = {
   presentation: Presentation;
@@ -8,6 +7,10 @@ type EditorState = {
 };
 
 let currentState: EditorState | null = null;
+let past: EditorState[] = [];
+let future: EditorState[] = [];
+
+let editorChangeHandler: (() => void) | null = null;
 
 function setInitialState(presentation: Presentation): void {
     currentState = {
@@ -15,6 +18,8 @@ function setInitialState(presentation: Presentation): void {
         activeSlideId: presentation.slides[0]?.id || '',
         isPreviewMode: false
     };
+    past = [];
+    future = [];
 }
 
 function getState(): EditorState | null {
@@ -24,42 +29,57 @@ function getState(): EditorState | null {
 type Modifier = (state: EditorState, ...args: any[]) => EditorState;
 
 function dispatch(modifier: Modifier, ...args: any[]): void {
-  if (!currentState) {
-    console.error('State is not initialized! Call setInitialState first.');
-    return;
-  }
+    if (!currentState) {
+        console.error('State is not initialized! Call setInitialState first.');
+        return;
+    }
 
-  currentState = modifier(currentState, ...args);
+    past = [...past, currentState];
+    future = [];
 
-  if (editorChangeHandler) {
-    editorChangeHandler();
-  }
+    currentState = modifier(currentState, ...args);
+
+    if (editorChangeHandler) {
+        editorChangeHandler();
+    }
+}
+
+function undo(): void {
+    if (past.length === 0 || !currentState) return;
+    future = [currentState, ...future];
+    const previous = past[past.length - 1];
+    past = past.slice(0, -1);
+    currentState = previous;
+    if (editorChangeHandler) {
+        editorChangeHandler();
+    }
+}
+
+function redo(): void {
+    if (future.length === 0 || !currentState) return;
+    past = [...past, currentState];
+    const next = future[0];
+    future = future.slice(1);
+    currentState = next;
+    if (editorChangeHandler) {
+        editorChangeHandler();
+    }
+}
+
+function getCanUndo(): boolean {
+    return past.length > 0;
+}
+
+function getCanRedo(): boolean {
+    return future.length > 0;
 }
 
 function getPreviewMode(): boolean {
-  return currentState ? currentState.isPreviewMode : false;
+    return currentState ? currentState.isPreviewMode : false;
 }
-
-let editorChangeHandler: (() => void) | null = null;
 
 function addEditorChangeHandler(handler: () => void): void {
     editorChangeHandler = handler;
-}
-
-function getBackgroundStyle(background?: Background): React.CSSProperties {
-    if (!background || background.type === 'none') {
-        return { backgroundColor: '#ffffff' };
-    }
-    if (background.type === 'color' || background.type === 'solid') {
-        return { backgroundColor: background.color };
-    }
-    if (background.type === 'image') {
-        return { backgroundImage: `url(${background.url})`, backgroundSize: 'cover', backgroundPosition: 'center' };
-    }
-    if (background.type === 'gradient') {
-        return { background: `linear-gradient(${background.angle}deg, ${background.colors.join(', ')})` };
-    }
-    return { backgroundColor: '#ffffff' };
 }
 
 export {
@@ -68,9 +88,12 @@ export {
     getState,
     addEditorChangeHandler,
     getPreviewMode,
-    getBackgroundStyle,
+    undo,
+    redo,
+    getCanUndo,
+    getCanRedo,
 };
 
 export type {
-  EditorState
+    EditorState
 }

@@ -1,8 +1,8 @@
 import type { EditorState } from "./editor";
 import type { Slide } from "../../../types/slide";
-import type { Point, SlideObject } from "../../../types/objects";
+import type { ImageObject, Point, SlideObject } from "../../../types/objects";
 import { generateId } from "../../../functions/utils";
-import { removeObject, moveObject, resizeObject } from "../../../functions/objects";
+import { removeObject, moveObject, resizeObject, addImageObject } from "../../../functions/objects";
 
 function changePresentationTitle(state: EditorState, newName: string): EditorState {
     return {
@@ -207,6 +207,23 @@ function resizeSelectedObjectsModifier(state: EditorState, activeSlideId: string
     };
 }
 
+function addImageObjectModifier(state: EditorState, newImage: ImageObject): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) {
+        return state;
+    }
+    const updatedSlide = addImageObject(state.presentation.slides[slideIndex], newImage);
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+    return {
+        ...state, 
+        presentation: { 
+            ...state.presentation, 
+            slides: newSlides
+        }
+    };
+}
+
 
 export {
     deleteSlideModifier,
@@ -219,5 +236,6 @@ export {
     setPreviewModeModifier,
     removeSelectedObjectsModifier,
     moveSelectedObjectsModifier,
-    resizeSelectedObjectsModifier
+    resizeSelectedObjectsModifier,
+    addImageObjectModifier
 };
