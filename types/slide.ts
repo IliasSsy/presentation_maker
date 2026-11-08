@@ -2,7 +2,6 @@ import type { SlideObject as SlideObject } from "./objects.ts";
 
 type Slide = {
     id: string;
-    name: string;
     number: number;
     elements: SlideObject[];
     notice: string;

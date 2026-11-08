@@ -1,8 +1,8 @@
 import type { Presentation } from "../../../../types/presentation";
-import { SlidePreview } from "../SlidePreview/slidePreview";
+import { SlideThumbnail } from "./SlideThumbnail";
 import styles from "./slideList.module.css";
 
-interface SlideListProps {
+type SlideListProps = {
     presentation: Presentation;
     activeSlideId: string;
     onSelectSlide: (id: string) => void;
@@ -11,9 +11,10 @@ interface SlideListProps {
 }
 
 function SlideList({ presentation, activeSlideId, onSelectSlide, onAddSlide, onDeleteSlide }: SlideListProps) {
+    const canDelete = presentation.slides.length > 1;
+
     return (
         <div className={styles.slideListContainer}>
-
             <div className={styles.listHeader}>
                 <span>Слайды</span>
                 <button className={styles.addButton} onClick={onAddSlide}>
@@ -21,37 +22,17 @@ function SlideList({ presentation, activeSlideId, onSelectSlide, onAddSlide, onD
                 </button>
             </div>
             <div className={styles.slidesContainer}>
-                {presentation.slides.map((slide, index) => {
-                    const isActive = slide.id === activeSlideId;
-
-                    return (
-                        <div
-                            key={slide.id}
-                            className={`${styles.thumbnailWrapper} ${isActive ? styles.active : ""}`}
-                            onClick={() => onSelectSlide(slide.id)}
-                        >
-                            <span className={styles.slideNumber}>{index + 1}</span>
-
-                            <div className={styles.previewContainer}>
-                                <div className={styles.scaledWrapper}>
-                                    <SlidePreview slide={slide} />
-                                </div>
-                            </div>
-                            {presentation.slides.length > 1 && (
-                                <button
-                                    className={styles.deleteButton}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        onDeleteSlide(slide.id);
-                                    }}
-                                    title="Удалить слайд"
-                                >
-                                    ×
-                                </button>
-                            )}
-                        </div>
-                    );
-                })}
+                {presentation.slides.map((slide, index) => (
+                    <SlideThumbnail
+                        key={slide.id || index}
+                        slide={slide}
+                        index={index}
+                        isActive={slide.id === activeSlideId}
+                        canDelete={canDelete}
+                        onSelect={onSelectSlide}
+                        onDelete={onDeleteSlide}
+                    />
+                ))}
             </div>
         </div>
     );

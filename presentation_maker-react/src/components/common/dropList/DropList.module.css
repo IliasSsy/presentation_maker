@@ -1,0 +1,26 @@
+.wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.select {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+    padding: 4px 6px;
+    cursor: pointer;
+    outline: none;
+}
+
+.select:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #5F6368;
+}
+
+.select option {
+    background-color: #292A2D;
+    color: #E8EAED;
+    padding: 6px;
+}

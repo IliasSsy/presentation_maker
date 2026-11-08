@@ -1,0 +1,7 @@
+.slide {
+    position: relative;
+    width: 960px;
+    height: 540px;  
+    background: transparent; 
+    overflow: hidden;
+}

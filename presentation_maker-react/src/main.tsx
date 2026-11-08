@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { setInitialState, addEditorChangeHandler } from './modules/editor';
 import { createTestPresentation } from './data/data';
+import { addLangChangeHandler } from './services/LanguageChoose/i18n';
 import "./index.css"
 
 setInitialState(createTestPresentation());
@@ -18,4 +19,5 @@ function render() {
 }
 
 addEditorChangeHandler(render);
+addLangChangeHandler(render);
 render();

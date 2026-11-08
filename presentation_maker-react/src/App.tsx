@@ -1,38 +1,50 @@
-import { SlideList } from "./components/SlideList/slideList";
-import { Toolbar } from "./components/Toolbar/Main/toolbar";
-import { Workspace } from "./components/Workspace/workSpace";
-import { getState, dispatch } from "./modules/editor";
-import { addSlideModifier, deleteSlideModifier, setActiveSlide } from "./modules/modifiers";
+import { SlideList } from "./components/slideList/SlideList";
+import { Toolbar } from "./components/toolbar/Toolbar";
+import { Workspace } from "./components/workspace/WorkSpace";
+import { PreviewOverlay } from "./components/previewOverlay/PreviewOverlay";
+import { getState, dispatch, getPreviewMode } from "./modules/editor";
+import { addSlideModifier, deleteSlideModifier, setActiveSlide, setPreviewModeModifier } from "./modules/modifiers";
 
 function App() {
-    const presentation = getState();
-    if (!presentation) {
-        return null;
-    }
-    const activeSlideId = presentation.activeSlideId || presentation.slides[0]?.id;
-    const activeSlide = presentation.slides.find((object) => object.id === activeSlideId) || presentation.slides[0];
-    return (
-        <div style={{ display: "flex", flexDirection: "column", width: "100vw", height: "100vh", overflow: "hidden", margin: 0 }}>
-            <Toolbar presentation={presentation} />
+  const state = getState();
+  const isPreview = getPreviewMode();
+  
+  if (!state) {
+    return null;
+  }
 
-            <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-                <SlideList
-                    presentation={presentation}
-                    activeSlideId={activeSlideId}
-                    onSelectSlide={(id) => {
-                        dispatch(setActiveSlide, id);
-                    }}
-                    onAddSlide={() => {
-                        dispatch(addSlideModifier);
-                    }}
-                    onDeleteSlide={(id) => {
-                        dispatch(deleteSlideModifier, id);
-                    }}
-                />
-                <Workspace activeSlide={activeSlide} />
-            </div>
-        </div>
-    );
+  const activeSlideId = state.activeSlideId || state.presentation.slides[0]?.id;
+  const activeSlide = state.presentation.slides.find(obj => obj.id === activeSlideId) || state.presentation.slides[0];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", width: "100vw", height: "100vh", overflow: "hidden", margin: 0 }}>
+      <Toolbar presentation={state.presentation} />
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <SlideList 
+          presentation={state.presentation}
+          activeSlideId={activeSlideId}
+          onSelectSlide={(id) => {
+            dispatch(setActiveSlide, id);
+          }}
+          onAddSlide={() => {
+            dispatch(addSlideModifier);
+          }}
+          onDeleteSlide={(id) => {
+            dispatch(deleteSlideModifier, id);
+          }}
+        />
+        <Workspace activeSlide={activeSlide} />
+      </div>
+
+
+      {isPreview && (
+        <PreviewOverlay 
+          presentation={state.presentation} 
+          onClose={() => dispatch(setPreviewModeModifier, false)} 
+        />
+      )}
+    </div>
+  );
 }
 
 export { App };

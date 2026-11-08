@@ -1,18 +1,8 @@
 import type { Slide } from "../types/slide.js";
-import type { TextObject, ImageObject, Size } from "../types/objects.js";
-import type { SlideObject } from "../types/objects.js";
+import type { TextObject, ImageObject, SlideObject} from "../types/objects.js";
 
 const DEAFULT_VALUE: number = 0;
 
-function isValidImageUrl(url: string): boolean {
-    const dot = url.lastIndexOf('.');
-    if (dot === -1) {
-        return false;
-    }
-    const format = url.slice(dot);
-    const possibleArray = ['.png', '.img', '.jpg', '.jpeg', '.webp', '.gif'];
-    return possibleArray.includes(format);
-}
 
 function modifyObject(slide: Slide, objectId: string, payload: Partial<SlideObject>): Slide {
     return {
@@ -33,7 +23,6 @@ function setSlideBackgroundColor(slide: Slide, color: string): Slide {
 }
 
 function setSlideBackgroundImage(slide: Slide, url: string): Slide {
-    if (!isValidImageUrl(url)) return slide;
     return { ...slide, background: { type: 'image', url } };
 }
 
@@ -52,7 +41,6 @@ function addTextObject(slide: Slide, object: TextObject): Slide {
 }
 
 function addImageObject(slide: Slide, object: ImageObject): Slide {
-    if (!isValidImageUrl(object.url)) return slide;
     return { ...slide, elements: [...slide.elements, object] };
 }
 
@@ -63,17 +51,20 @@ function removeObject(slide: Slide, objectId: string): Slide {
     };
 }
 
-function resizeObject(slide: Slide, objectId: string, size: Size): Slide {
-    return modifyObject(slide, objectId, { size });
+function resizeObject(slide: Slide, objectId: string, payload?: Partial<SlideObject>): Slide {
+    if (!payload) {
+        return slide; 
+    }
+    return modifyObject(slide, objectId, payload);
 }
 
 function moveObject(slide: Slide, objectId: string, newX: number, newY: number): Slide {
     return modifyObject(slide, objectId, { position: { x: newX, y: newY } });
 }
 
-function updateTextObjectStyle(slide: Slide, objectId: string, fontFamily: string, fontSize: number, fontColor: string): Slide {
+function updateTextObjectStyle(slide: Slide, objectId: string, newStyle: Partial<TextObject['style']>): Slide {
     return modifyObject(slide, objectId, {
-        style: { fontFamily, fontColor, fontSize }
+        style: newStyle
     } as Partial<TextObject>); 
 }
 

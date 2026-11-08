@@ -1,26 +1,42 @@
-import type { Slide } from "../../../../types/slide";
-import { SlidePreview } from "../SlidePreview/slidePreview";
-import styles from "./workspace.module.css";
+import type { Slide } from "../../../../types/slide.js";
+import { SlidePreview } from "../slidePreview/SlidePreview.js";
+import { useSelection } from "./hooks/useSelection.js";
+import styles from "./WorkSpace.module.css";
 
-interface WorkspaceProps {
+type WorkspaceProps = {
     activeSlide: Slide;
 }
 
 function Workspace({ activeSlide }: WorkspaceProps) {
+    const { activeObjectIds, handleObjectClick, handleBackgroundClick } = useSelection();
     return (
         <div className={styles.workspaceContainer}>
-            <div className={styles.canvasArea}>
-                <div className={styles.canvasWrapper}>
-                    <SlidePreview slide={activeSlide} />
+            <div 
+                className={styles.canvasArea} 
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) {
+                        handleBackgroundClick();
+                    }
+                }}
+            >
+                <div 
+                    className={styles.canvasWrapper}
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            handleBackgroundClick();
+                        }
+                    }}
+                >
+                    <SlidePreview 
+                        slide={activeSlide} 
+                        selectedIds={activeObjectIds}
+                        onObjectClick={handleObjectClick}
+                        onBackgroundClick={handleBackgroundClick}
+                    />
                 </div>
             </div>
-
             <div className={styles.speakerNotesContainer}>
-                <textarea
-                    className={styles.speakerNotesInput}
-                    placeholder="Нажмите, чтобы ввести заметки"
-                    rows={2}
-                />
+                <textarea className={styles.speakerNotesInput} placeholder="Нажмите, чтобы ввести заметки" rows={2} />
             </div>
         </div>
     );

@@ -5,11 +5,30 @@ type Objects = {
     layer: number,
 }
 
-type TextObject = Objects  & {
+type InlineStyle = {
+    fontFamily: string,
+    fontSize: number,
+    fontColor: string,
+    bold: boolean,
+    italic: boolean,
+    underline: boolean,
+}
+
+type TextChunk = {
+    text: string,
+    style: InlineStyle,
+}
+
+type BlockStyle = {
+    fillColor: string,
+    textAlign: 'left' | 'center' | 'right',
+}
+
+type TextObject = Objects & {
     type: 'text',
     size: Size,
-    content: string,
-    style: TextStyle,
+    content: TextChunk[],
+    style: BlockStyle,    
 }
 
 type Size = {
@@ -32,17 +51,6 @@ type ImageObject = Objects &  {
 type Point = {
     x: number,
     y: number,
-}
-
-type TextStyle = {
-    fontFamily: string,
-    fontSize: number,
-    fontColor: string,
-    bold: boolean,
-    italic: boolean,
-    underline: boolean,
-    fillColor: string,
-    textAlign: 'left' | 'center' | 'right',
 }
 
 type Circle = Figure & {
@@ -68,7 +76,9 @@ type SlideObject = TextObject | ImageObject | Circle | Rectangle | Triangle;
 
 export {
     type SlideObject,
-    type TextStyle,
+    type BlockStyle,    
+    type InlineStyle,   
+    type TextChunk,     
     type TextObject,
     type ImageObject,
     type Size,
