@@ -19,11 +19,15 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        if (e.button !== 0) return; 
-        if (onMouseDown) {
-            onMouseDown(e);
-        }
-    };
+            if (e.button !== 0) return; 
+            const target = e.target as HTMLElement;
+            if (target.closest('[id^="text-editor-"]')) {
+                return; 
+            }
+            if (onMouseDown) {
+                onMouseDown(e);
+            }
+        };
 
     if (object.type === 'text') {
         const { size, content, style } = object;
@@ -37,19 +41,27 @@ function SlideObjectComp({ object, position, onClick, onMouseDown }: SlideObject
                     ...baseStyle,
                     width: `${size.width}px`,
                     height: `${size.height}px`,
-                    fontFamily: style.fontFamily,
-                    fontSize: `${style.fontSize}px`,
-                    color: style.fontColor,
                     backgroundColor: style.fillColor,
-                    fontWeight: style.bold ? 'bold' : 'normal',
-                    fontStyle: style.italic ? 'italic' : 'normal',
-                    textDecoration: style.underline ? 'underline' : 'none',
                     textAlign: style.textAlign,
                     overflow: 'visible', 
                     whiteSpace: 'pre-wrap',
                 }}
             >
-                {content}
+                {content.map((chunk, index) => (
+                    <span 
+                        key={index}
+                        style={{
+                            fontFamily: chunk.style.fontFamily,
+                            fontSize: `${chunk.style.fontSize}px`,
+                            color: chunk.style.fontColor,
+                            fontWeight: chunk.style.bold ? 'bold' : 'normal',
+                            fontStyle: chunk.style.italic ? 'italic' : 'normal',
+                            textDecoration: chunk.style.underline ? 'underline' : 'none',
+                        }}
+                    >
+                        {chunk.text}
+                    </span>
+                ))}
             </div>
         );
     }

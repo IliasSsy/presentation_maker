@@ -1,10 +1,9 @@
 import type { Presentation } from "../types/presentation.js";
 import type { Slide } from "../types/slide.js";
 
-function createDefaultSlide(id: string, name?: string): Slide {
+function createDefaultSlide(id: string,): Slide {
     return {
         id,
-        name: name ?? 'Слайд 1',
         number: 1,
         background: { type: 'none' },
         elements: [],
@@ -12,9 +11,8 @@ function createDefaultSlide(id: string, name?: string): Slide {
     }
 }
 
-function addSlide(presentation: Presentation, slideId: string, slideName?: string): Presentation {
-    const name:string = slideName ?? `Слайд ${presentation.slides.length + 1}`;
-    const newSlide:Slide = createDefaultSlide(slideId, name);
+function addSlide(presentation: Presentation, slideId: string): Presentation {
+    const newSlide:Slide = createDefaultSlide(slideId);
     return {
         ...presentation,
         slides: [...presentation.slides, newSlide],

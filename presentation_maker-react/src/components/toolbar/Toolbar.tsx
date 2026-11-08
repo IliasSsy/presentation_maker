@@ -10,6 +10,7 @@ import { changePresentationTitle } from "../../modules/modifiers.js";
 import { startPreviewModifier } from "../../modules/modifiers.js";
 import { useImageUpload } from "./hooks/useImageUpload.ts";
 import type { DropListOption } from "../common/dropList/DropList.js";
+import { handleAddText } from "../common/textObjectComp/handleAddText.ts";
 import arrowIcon from "./icons/arrow.svg";
 import prevIcon from "./icons/undo.svg";
 import nextIcon from "./icons/rendo.svg";
@@ -40,9 +41,9 @@ function Toolbar({ presentation }: ToolbarProps) {
         { tooltip: "redoItem", icon: nextIcon },
     ];
     const insertTools = [
-        { tooltip: "printItem", icon: printerIcon },
-        { tooltip: "textButton", icon: textIcon },
-        { tooltip: "shapesButton", icon: shapeIcon },
+        { tooltip: "printItem", icon: printerIcon, onClick: () => console.log('Печать') },
+        { tooltip: "textButton", icon: textIcon, onClick: () => handleAddText() },
+        { tooltip: "shapesButton", icon: shapeIcon, onClick: () => console.log('shapes') },
     ];
     const { fileInputRef, handleFileChange, triggerUpload } = useImageUpload();
     return (
@@ -74,7 +75,7 @@ function Toolbar({ presentation }: ToolbarProps) {
             <div className={styles.divider} />
             <div className={styles.group}>
                 {insertTools.map((tool) => (
-                    <ToolbarButton key={tool.tooltip} tooltipKey={tool.tooltip} icon={tool.icon} />
+                    <ToolbarButton key={tool.tooltip} tooltipKey={tool.tooltip} icon={tool.icon} onClick={tool.onClick} />
                 ))}
                 <Button tooltipKey="addImage" onClick={triggerUpload}>
                     IMG

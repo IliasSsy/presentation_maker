@@ -70,8 +70,14 @@ function resizeObject(item: SlideObject, startBox: SelectionBox, finalBox: Selec
             },
             style: {
                 ...item.style,
-                fontSize: Math.max(MIN_SIZE, Math.round(item.style.fontSize * scaleY))
-            }
+            },
+            content: item.content.map(chunk => ({
+                ...chunk,
+                style: {
+                    ...chunk.style,
+                    fontSize: Math.max(MIN_SIZE, Math.round(chunk.style.fontSize * scaleY))
+                }
+            }))
         };
     }
     if ("size" in item) {

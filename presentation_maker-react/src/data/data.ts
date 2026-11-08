@@ -3,18 +3,20 @@ import { createPresentation } from "../../../functions/presentation.js"
 import { addSlide } from "../../../functions/slide.js"
 import { generateId } from "../../../functions/utils.js"
 import { addTextObject, setSlideBackgroundColor } from "../../../functions/objects.js"
-import type { TextObject, TextStyle } from "../../../types/objects.js"
+import type { TextObject, BlockStyle, InlineStyle, Point, Size } from "../../../types/objects.js"
 import type { Slide } from "../../../types/slide.js"
-import type { Point, Size } from "../../../types/objects.js"
 
-const defaultStyle: TextStyle = {
+const defaultInlineStyle: InlineStyle = {
     fontFamily: "Arial",
     fontSize: 14,
     fontColor: "#333333",
     bold: false,
     italic: false,
     underline: false,
-    fillColor: "none",
+};
+
+const defaultBlockStyle: BlockStyle = {
+    fillColor: "transparent",
     textAlign: "left"
 };
 
@@ -22,7 +24,7 @@ function createDefaultTextObject(
     content: string, 
     position: Point, 
     size: Size,
-    customStyle?: Partial<TextStyle>
+    customStyle?: Partial<InlineStyle & BlockStyle>
 ): TextObject {
     return {
         id: generateId(),
@@ -30,11 +32,23 @@ function createDefaultTextObject(
         type: 'text',
         layer: 1,
         size,
-        content,
         style: {
-            ...defaultStyle,
-            ...customStyle
-        }
+            fillColor: customStyle?.fillColor || defaultBlockStyle.fillColor,
+            textAlign: customStyle?.textAlign || defaultBlockStyle.textAlign,
+        },
+        content: [
+            {
+                text: content,
+                style: {
+                    fontFamily: customStyle?.fontFamily || defaultInlineStyle.fontFamily,
+                    fontSize: customStyle?.fontSize || defaultInlineStyle.fontSize,
+                    fontColor: customStyle?.fontColor || defaultInlineStyle.fontColor,
+                    bold: customStyle?.bold || defaultInlineStyle.bold,
+                    italic: customStyle?.italic || defaultInlineStyle.italic,
+                    underline: customStyle?.underline || defaultInlineStyle.underline,
+                }
+            }
+        ]
     };
 }
 

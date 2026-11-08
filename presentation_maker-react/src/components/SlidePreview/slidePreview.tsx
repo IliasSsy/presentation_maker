@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import type { Slide } from "../../../../types/slide";
-import { SlideObjectComp } from "../slideObject/SlideObject"; 
+import { SlideObjectComp } from "../slideObjectComp/SlideObject"; 
 import { useDragAndDrop } from "./hooks/useDrugAndDrop"; 
 import { useResize } from "./hooks/resize/useResize"; 
 import { dispatch } from "../../modules/editor";
