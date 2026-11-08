@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import type { Slide } from "../../../../types/slide";
 import { SlideObjectComp } from "../slideObjectComp/SlideObject"; 
-import { useDragAndDrop } from "./hooks/useDrugAndDrop"; 
-import { useResize } from "./hooks/resize/useResize"; 
+import { useDragAndDrop } from "./hooks/useDrugAndDrop";
+import { useResize } from "./hooks/resize/useResize";
 import { dispatch } from "../../modules/editor";
 import { moveSelectedObjectsModifier, resizeSelectedObjectsModifier } from "../../modules/modifiers";
 import styles from "./SlidePreview.module.css";
@@ -37,7 +37,7 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
     const selectedElements = (slide.elements || []).filter(element => selectedIds.includes(element.id));
     const { isResizing, handleResizeStart, previewBox } = useResize(
         selectedElements, 
-        (newObjects) => {
+        (newObjects) => {   
             if (newObjects.length > 0) {
                 dispatch(resizeSelectedObjectsModifier, slide.id, newObjects);
             }
@@ -54,7 +54,14 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
             return element.position.x + width;
         }));
         const maxY = Math.max(...selectedElements.map(element => {
-            const height = 'size' in element ? element.size.height : element.radius * 2;
+            let height = 0;
+            if (element.type === 'text') {
+                height = element.size.height;
+            } else if ('size' in element) {
+                height = element.size.height;
+            } else {
+                height = element.radius * 2;
+            }
             return element.position.y + height;
         }));
         selectionBox = {
@@ -77,10 +84,28 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
             return tempVersion ? tempVersion : element;
         });
     }
+
+    let slideBg = '#ffffff'; 
+    if (slide.background) {
+        if (slide.background.type === 'color') {
+            slideBg = slide.background.color;
+        } else if (slide.background.type === 'image') {
+            slideBg = `url(${slide.background.url}) center/cover no-repeat`;
+        } else if (slide.background.type === 'gradient') {
+            slideBg = `linear-gradient(${slide.background.angle}deg, ${slide.background.colors.join(', ')})`;
+        }
+    }
+
     return (
         <div 
             id="slide-background" 
             className={styles.slidePreview} 
+            style={{ 
+                background: slideBg,
+                width: '100%',
+                height: '100%',
+                position: 'relative' 
+            }}
             onMouseDown={(event) => {
                 if (event.button !== 0) {
                     return

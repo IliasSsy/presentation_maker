@@ -1,5 +1,5 @@
-import { SlidePreview } from "../slidePreview/SlidePreview.js";
-import type { Slide } from "../../../../types/slide.js";
+import { SlidePreview } from "../SlidePreview/slidePreview.js";
+import type { Slide } from "../../../../types/slide";
 import styles from "./slideList.module.css"; 
 
 type SlideThumbnailProps = {
@@ -19,16 +19,22 @@ function SlideThumbnail({ slide, index, isActive, canDelete, onSelect, onDelete 
             onClick={() => onSelect(slide.id)}
         >
             <span className={styles.slideNumber}>{index + 1}</span>
+            
             <div className={styles.previewContainer}>
                 <div className={styles.scaledWrapper}>
-                    <SlidePreview slide={slide} />
+                    <SlidePreview 
+                        slide={slide} 
+                        selectedIds={[]}
+                        onObjectClick={() => {}} 
+                        onBackgroundClick={() => {}}
+                    />
                 </div>
             </div>
+            
             {canDelete && (
                 <button
                     className={styles.deleteButton}
                     onClick={(event) => {
-                        event.stopPropagation();
                         onDelete(slide.id);
                     }}
                     title="Удалить слайд"

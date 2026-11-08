@@ -61,6 +61,7 @@ function resizeObject(item: SlideObject, startBox: SelectionBox, finalBox: Selec
         y: finalBox.point.y + (item.position.y - startBox.point.y) * scaleY
     };
     if (item.type === "text") {
+        const fontScale = Math.min(Math.abs(scaleX), Math.abs(scaleY));
         return {
             ...item,
             position: newPosition,
@@ -75,7 +76,7 @@ function resizeObject(item: SlideObject, startBox: SelectionBox, finalBox: Selec
                 ...chunk,
                 style: {
                     ...chunk.style,
-                    fontSize: Math.max(MIN_SIZE, Math.round(chunk.style.fontSize * scaleY))
+                    fontSize: Math.max(8, Math.round(chunk.style.fontSize * fontScale))
                 }
             }))
         };

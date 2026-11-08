@@ -1,5 +1,5 @@
 import type { Slide } from "../../../../types/slide.js";
-import { SlidePreview } from "../slidePreview/SlidePreview.js";
+import { SlidePreview } from "../SlidePreview/slidePreview.js";
 import { useSelection } from "./hooks/useSelection.js";
 import styles from "./WorkSpace.module.css";
 

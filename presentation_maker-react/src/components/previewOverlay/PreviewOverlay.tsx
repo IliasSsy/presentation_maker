@@ -1,4 +1,4 @@
-import { SlidePreview } from "../slidePreview/SlidePreview";
+import { SlidePreview } from "../SlidePreview/slidePreview";
 import type { Presentation } from "../../../../types/presentation";
 import { getState, dispatch } from "../../modules/editor";
 import { nextSlideModifier, prevSlideModifier } from "../../modules/modifiers";
@@ -14,26 +14,33 @@ function PreviewOverlay({ presentation, onClose }: PreviewModProps) {
     if (state == null) {
         return null;
     }
+    
     const slides = presentation.slides;
     const currentIndex = slides.findIndex(slide => slide.id === state.activeSlideId);
     const currentSlide = slides[currentIndex] || slides[0];
+
     return (
         <div className={styles.overlay}>
             <button className={styles.closeButton} onClick={onClose}>
-                x
+                ✕
             </button>
             <button 
                 className={styles.prevButton} 
                 onClick={() => dispatch(prevSlideModifier)}
             >
             </button>
+            
             <div className={styles.slideContainer}>
-                <div 
-                    className={styles.slideWrapper} 
-                >
-                    <SlidePreview slide={currentSlide} />
+                <div className={styles.slideWrapper}>
+                    <SlidePreview 
+                        slide={currentSlide}
+                        selectedIds={[]} 
+                        onObjectClick={() => {}} 
+                        onBackgroundClick={() => {}} 
+                    />
                 </div>
             </div>
+            
             <button 
                 className={styles.nextButton} 
                 onClick={() => dispatch(nextSlideModifier)}
