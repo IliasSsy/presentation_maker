@@ -12,6 +12,17 @@ type ResizeDirection =
     | "top"
     | "bottom";
 
+const cursorMap: Record<ResizeDirection, string> = {
+    "top": "ns-resize",
+    "bottom": "ns-resize",
+    "left": "ew-resize",
+    "right": "ew-resize",
+    "top-left": "nwse-resize",
+    "bottom-right": "nwse-resize",
+    "top-right": "nesw-resize",
+    "bottom-left": "nesw-resize",
+};
+
 type SelectionBox = {
     point: Point;
     size: Size;
@@ -102,6 +113,7 @@ function resizeObjects(objects: SlideObject[], startBox: SelectionBox, finalBox:
 export {
     calculateResizedBox,
     resizeObjects,
+    cursorMap,
     type SelectionBox,
     type ResizeDirection
 }

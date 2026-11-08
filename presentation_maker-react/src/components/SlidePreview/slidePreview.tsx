@@ -7,6 +7,7 @@ import { dispatch } from "../../modules/editor";
 import { moveSelectedObjectsModifier, resizeSelectedObjectsModifier } from "../../modules/modifiers";
 import styles from "./SlidePreview.module.css";
 import type { ResizeDirection } from "./hooks/resize/resizeUtils";
+import { resizeObjects } from "./hooks/resize/resizeUtils";
 
 const resizeHandleStyle: React.CSSProperties = {
     position: 'absolute',
@@ -68,6 +69,14 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
         };
     }
     const activeBox = (isResizing && previewBox) ? previewBox : selectionBox;
+    let displayElements = slide.elements || [];
+    if (isResizing && previewBox && selectionBox) {
+        const temporaryResizedObjects = resizeObjects(selectedElements, selectionBox, previewBox);
+        displayElements = displayElements.map(element => {
+            const tempVersion = temporaryResizedObjects.find(resizer => resizer.id === element.id);
+            return tempVersion ? tempVersion : element;
+        });
+    }
     return (
         <div 
             id="slide-background" 
@@ -82,14 +91,13 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                 }
             }}
         >
-            {(slide.elements || []).map(element => {
+            {displayElements.map(element => {
                 const isSelected = (selectedIds || []).includes(element.id);
                 const isMoving = isDragging && draggedObjectIds.includes(element.id);
                 const currentPosition = {
                     x: element.position.x + (isMoving ? dragOffset.x : 0),
                     y: element.position.y + (isMoving ? dragOffset.y : 0)
                 };
-                
                 return (
                    <SlideObjectComp 
                         key={element.id}    
