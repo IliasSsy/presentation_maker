@@ -1,9 +1,10 @@
 import { useRef } from "react";
 import { Button } from "../common/button/Button.js";
-import { DropList, type DropListOption } from "../common/dropList/DropList.js";
+import { DropList } from "../common/dropList/DropList.js";
 import { dispatch } from "../../modules/editor.js";
 import { updateTextModifier } from "../../modules/modifiers.js";
-import type { TextObject, InlineStyle } from "../../../../types/objects.js";
+import type { TextObject } from "../../../../types/objects.js";
+import { FONT_OPTIONS, SIZE_OPTIONS, toHexColor, applyTextStyle, type FontSize } from "./utils/textPanelUtils.js";
 import alignLeftIcon from "./icons/align_left.svg";
 import alignCenterIcon from "./icons/align_center.svg";
 import alignRightIcon from "./icons/align_right.svg";
@@ -14,28 +15,6 @@ type TextPanelProps = {
     placement?: "top" | "bottom";
 };
 
-type FontFamily = "Arial" | "Georgia" | "Times New Roman" | "Courier New";
-type FontSize = "12" | "14" | "16" | "18" | "20" | "22" | "24" | "28" | "32" | "48";
-
-const FONT_OPTIONS: DropListOption<FontFamily>[] = [
-    { id: "Arial", name: "Arial" },
-    { id: "Georgia", name: "Georgia" },
-    { id: "Times New Roman", name: "Times New Roman" },
-    { id: "Courier New", name: "Courier New" },
-];
-
-const SIZE_OPTIONS: DropListOption<FontSize>[] = [
-    "12", "14", "16", "18", "20", "22", "24", "28", "32", "48"
-].map(size => ({ id: size as FontSize, name: size }));
-
-function toHexColor(color: string = "#000000"): string {
-    if (color.startsWith("#")) return color;
-    const rgb = color.match(/\d+/g);
-    return rgb && rgb.length >= 3
-        ? "#" + rgb.slice(0, 3).map(x => Number(x).toString(16).padStart(2, "0")).join("")
-        : "#000000";
-}
-
 function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps) {
     const currentStyle = selectedTextObject.content[0]?.style || {
         fontFamily: "Arial",
@@ -44,58 +23,31 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
     };
     const savedRange = useRef<Range | null>(null);
     const saveSelection = () => {
-        const sel = window.getSelection();
+        const selection = window.getSelection();
         const editor = document.querySelector('[contenteditable="true"]');
-        if (sel && sel.rangeCount > 0 && editor?.contains(sel.getRangeAt(0).commonAncestorContainer)) {
-            savedRange.current = sel.getRangeAt(0).cloneRange();
-        }
-    };
-    const applyStyle = (
-        command: string,
-        value: string | undefined,
-        fallbackPatch: Partial<InlineStyle>,
-        afterExec?: (editor: HTMLElement) => void
-    ) => {
-        const editor = document.querySelector('[contenteditable="true"]') as HTMLElement | null;
-        const sel = window.getSelection();
-        if (sel && savedRange.current) {
-            sel.removeAllRanges();
-            sel.addRange(savedRange.current);
-        }
-        if (editor && savedRange.current && !savedRange.current.collapsed) {
-            if (command !== "foreColor") editor.focus();
-            document.execCommand("styleWithCSS", false, "true");
-            document.execCommand(command, false, value);
-            afterExec?.(editor);
-            saveSelection();
-            editor.dispatchEvent(new Event("input", { bubbles: true }));
-        } else {
-            dispatch(updateTextModifier, {
-                ...selectedTextObject,
-                content: selectedTextObject.content.map(chunk => ({
-                    ...chunk,
-                    style: { ...chunk.style, ...fallbackPatch }
-                }))
-            });
+        if (!selection?.rangeCount || !editor) return;
+        const range = selection.getRangeAt(0);
+        if (editor.contains(range.startContainer) && editor.contains(range.endContainer)) {
+            savedRange.current = range.cloneRange();
         }
     };
     const handleSizeChange = (size: FontSize) => {
-        applyStyle("fontSize", "7", { fontSize: Number(size) }, (editor) => {
-            editor.querySelectorAll<HTMLElement>("span, font").forEach(el => {
-                if (el.getAttribute("size") === "7" || el.style.fontSize.includes("xxx-large")) {
-                    el.removeAttribute("size");
-                    el.style.fontSize = `${size}px`;
+        applyTextStyle(selectedTextObject, savedRange, "fontSize", { fontSize: Number(size) }, "7", (editor) => {
+            editor.querySelectorAll<HTMLElement>("span, font").forEach(element => {
+                if (element.getAttribute("size") === "7" || element.style.fontSize.includes("xxx-large")) {
+                    element.removeAttribute("size");
+                    element.style.fontSize = `${size}px`;
                 }
             });
         });
     };
-    const handleFormat = (e: React.MouseEvent, cmd: "bold" | "italic" | "underline") => {
-        e.preventDefault();
+    const handleFormat = (event: React.MouseEvent, cmd: "bold" | "italic" | "underline") => {
+        event.preventDefault();
         saveSelection();
-        applyStyle(cmd, undefined, { [cmd]: !currentStyle[cmd] });
+        applyTextStyle(selectedTextObject, savedRange, cmd, { [cmd]: !currentStyle[cmd] });
     };
-    const handleAlign = (e: React.MouseEvent, textAlign: "left" | "center" | "right") => {
-        e.preventDefault();
+    const handleAlign = (event: React.MouseEvent, textAlign: "left" | "center" | "right") => {
+        event.preventDefault();
         dispatch(updateTextModifier, {
             ...selectedTextObject,
             style: { ...selectedTextObject.style, textAlign },
@@ -106,17 +58,17 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
         <div
             data-panel="text-panel"
             className={`${styles.textPanel} ${placementClass}`}
-            onMouseDown={(e) => {
+            onMouseDown={(event) => {
                 saveSelection();
-                if (!(e.target as HTMLElement).closest("select, input, option")) {
-                    e.preventDefault();
+                if (!(event.target as HTMLElement).closest("select, input, option")) {
+                    event.preventDefault();
                 }
             }}
         >
             <div className={styles.group}>
                 <DropList
                     defaultValue={currentStyle.fontFamily}
-                    onChange={(font) => applyStyle("fontName", font, { fontFamily: font })}
+                    onChange={(font) => applyTextStyle(selectedTextObject, savedRange, "fontName", { fontFamily: font }, font)}
                     options={FONT_OPTIONS}
                 />
             </div>
@@ -152,7 +104,7 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
                     type="color"
                     value={toHexColor(currentStyle.fontColor)}
                     onMouseDown={saveSelection}
-                    onChange={(e) => applyStyle("foreColor", e.target.value, { fontColor: e.target.value })}
+                    onChange={(e) => applyTextStyle(selectedTextObject, savedRange, "foreColor", { fontColor: e.target.value }, e.target.value)}
                     className={styles.colorPicker}
                     title="Цвет текста"
                 />

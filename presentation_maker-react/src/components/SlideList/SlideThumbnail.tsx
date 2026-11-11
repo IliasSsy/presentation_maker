@@ -11,7 +11,6 @@ type SlideThumbnailProps = {
     onDelete: (id: string) => void;
 }
 
-// Миниатюра
 function SlideThumbnail({ slide, index, isActive, canDelete, onSelect, onDelete }: SlideThumbnailProps) {
     return (
         <div
@@ -34,7 +33,7 @@ function SlideThumbnail({ slide, index, isActive, canDelete, onSelect, onDelete 
             {canDelete && (
                 <button
                     className={styles.deleteButton}
-                    onClick={(event) => {
+                    onClick={() => {
                         onDelete(slide.id);
                     }}
                     title="Удалить слайд"

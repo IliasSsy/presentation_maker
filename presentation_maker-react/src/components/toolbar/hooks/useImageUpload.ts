@@ -22,7 +22,7 @@ function useImageUpload() {
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
-    }, []); 
+    }, []);
     const triggerUpload = useCallback(() => {
         fileInputRef.current?.click();
     }, []);

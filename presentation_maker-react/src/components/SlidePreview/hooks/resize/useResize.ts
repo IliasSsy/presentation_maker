@@ -16,7 +16,7 @@ function useResize(selectedObjects: SlideObject[] = [], onResizeEnd: (newObjects
     const resizeStateRef = useRef<ResizeState>(null);
     const handleResizeStart = (event: React.MouseEvent, direction: ResizeDirection, currentBox: SelectionBox) => {
         event.preventDefault();
-        document.body.style.cursor = cursorMap[direction]
+        document.body.style.setProperty("cursor", cursorMap[direction], "important");
         resizeStateRef.current = {
             direction,
             startMouse: {
@@ -57,7 +57,7 @@ function useResize(selectedObjects: SlideObject[] = [], onResizeEnd: (newObjects
             onResizeEnd(updatedObjects);
             resizeStateRef.current = null;
             setIsResizing(false);
-            document.body.style.cursor = ''
+            document.body.style.removeProperty("cursor");
             setPreviewBox(null);
         };
         window.addEventListener("mousemove", handleMouseMove);

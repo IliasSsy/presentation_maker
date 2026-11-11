@@ -1,72 +1,72 @@
 import type { InlineStyle, TextChunk } from "../../../../../../types/objects";
 
-export function parseHtmlToChunks(
+function extractNodeStyle(element: HTMLElement, currentStyle: InlineStyle): InlineStyle {
+    const style = { ...currentStyle };
+    const tag = element.tagName.toUpperCase();
+    const isBold = tag === "B" || tag === "STRONG" || element.style.fontWeight === "bold" 
+    || Number(element.style.fontWeight) >= 700;
+
+    const isItalic = tag === "I" || tag === "EM" || element.style.fontStyle === "italic";
+
+    const isUnderline = tag === "U" || element.style.textDecoration.includes("underline") 
+
+    if (isBold) style.bold = true;
+    if (isItalic) style.italic = true;
+    if (isUnderline) style.underline = true;
+    const font = element.style.fontFamily || (tag === "FONT" ? element.getAttribute("face") : null);
+    if (font) {
+        style.fontFamily = font.replace(/['"]/g, "").trim() as InlineStyle["fontFamily"];
+    }
+    if (element.style.fontSize) {
+        const size = parseInt(element.style.fontSize, 10);
+        if (!isNaN(size) && size > 0 && size < 50) style.fontSize = size;
+    }
+    const color = element.style.color || (tag === "FONT" ? element.getAttribute("color") : null); 
+    if (color) {
+        style.fontColor = color;
+    }
+    return style;
+}
+
+function parseHtmlToChunks(
     container: HTMLElement,
     baseStyle: InlineStyle
 ): TextChunk[] {
     const chunks: TextChunk[] = [];
 
-    function traverse(node: Node, currentStyle: InlineStyle) {
+    function traverse(node: Node, style: InlineStyle) {
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent || "";
-            if (text.length > 0) {
-                chunks.push({
-                    text,
-                    style: { ...currentStyle },
-                });
-            }
+            if (text) chunks.push({ text, style });
             return;
         }
 
         if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as HTMLElement;
-            const tag = element.tagName.toUpperCase();
-
+            const tag = element.tagName;
             if (tag === "BR") {
-                chunks.push({
-                    text: "\n",
-                    style: { ...currentStyle },
-                });
+                chunks.push({ text: "\n", style });
                 return;
             }
-
-            const nextStyle: InlineStyle = { ...currentStyle };
-            if (tag === "B" || tag === "STRONG" || element.style.fontWeight === "bold" || Number(element.style.fontWeight) >= 700) {
-                nextStyle.bold = true;
-            }
-            if (tag === "I" || tag === "EM" || element.style.fontStyle === "italic") {
-                nextStyle.italic = true;
-            }
-            if (tag === "U" || element.style.textDecoration.includes("underline") || element.style.textDecorationLine.includes("underline")) {
-                nextStyle.underline = true;
-            }
-
-            if (element.style.fontFamily) {
-                nextStyle.fontFamily = element.style.fontFamily.replace(/['"]/g, "").trim() as InlineStyle["fontFamily"];
-            } else if (tag === "FONT" && element.getAttribute("face")) {
-                nextStyle.fontFamily = element.getAttribute("face")!.replace(/['"]/g, "").trim() as InlineStyle["fontFamily"];
-            }
-            if (element.style.fontSize) {
-                const parsedSize = parseInt(element.style.fontSize, 10);
-                if (!isNaN(parsedSize)) {
-                    nextStyle.fontSize = parsedSize;
+            const isBlock = tag === "DIV" || tag === "P";
+            if (isBlock && chunks.length > 0) {
+                const lastChunk = chunks[chunks.length - 1];
+                if (!lastChunk.text.endsWith("\n")) {
+                    chunks.push({ text: "\n", style });
                 }
             }
-            if (element.style.color) {
-                nextStyle.fontColor = element.style.color;
-            } else if (tag === "FONT" && element.getAttribute("color")) {
-                nextStyle.fontColor = element.getAttribute("color")!;
-            }
-
+            const nextStyle = extractNodeStyle(element, style);
             element.childNodes.forEach((child) => traverse(child, nextStyle));
+            if (isBlock && chunks.length > 0) {
+                const lastChunk = chunks[chunks.length - 1];
+                if (!lastChunk.text.endsWith("\n")) {
+                    chunks.push({ text: "\n", style: nextStyle });
+                }
+            }
         }
     }
-
     container.childNodes.forEach((child) => traverse(child, baseStyle));
-
-    if (chunks.length === 0) {
-        return [{ text: "", style: { ...baseStyle } }];
-    }
-
-    return chunks;
+    return chunks.length > 0 ? chunks : [{ text: "", style: { ...baseStyle } }];
 }
+
+export {parseHtmlToChunks}

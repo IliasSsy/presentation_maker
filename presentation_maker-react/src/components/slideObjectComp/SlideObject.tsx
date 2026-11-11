@@ -17,7 +17,6 @@ function SlideObjectComp({object, position, isSelected = false, onClick, onMouse
         left: `${position.x}px`,
         top: `${position.y}px`,
         zIndex: object.layer,
-        cursor: onMouseDown ? 'pointer' : 'default',
         userSelect: 'none',
     };
 

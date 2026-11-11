@@ -42,8 +42,7 @@ function SelectionBox({
                 top: `${activeBox.point.y}px`,
                 width: `${activeBox.size.width}px`,
                 height: `${activeBox.size.height}px`,
-                outline: '1px solid #0b99ff',
-                cursor: isDragging ? 'grabbing' : 'grab', 
+                outline: '1px solid #0b99ff', 
                 zIndex: 5, 
                 backgroundColor: 'transparent', 
             }}
@@ -51,12 +50,12 @@ function SelectionBox({
                 if (event.button !== 0) return;
                 const target = event.target as HTMLElement;
                 const resizeDirection = target.dataset.resize as ResizeDirection;
-                
-                if (resizeDirection && selectionBox) {
-                    onResizeStart(event, resizeDirection, activeBox);
-                    return; 
+                if (resizeDirection) {
+                    if (selectionBox) {
+                        onResizeStart(event, resizeDirection, activeBox);
+                    }
+                    return;
                 }
-                
                 onMouseDown(event);
             }}
         >

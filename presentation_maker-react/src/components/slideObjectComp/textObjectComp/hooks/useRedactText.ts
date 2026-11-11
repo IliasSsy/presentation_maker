@@ -1,54 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import { chunksToHtml, placeCaretAtEnd } from "./redactTextUtils";
 import type { TextObject, TextChunk } from "../../../../../../types/objects";
 import { parseHtmlToChunks } from "../utils/parseHtmlToChanks";
 
-function chunksToHtml(content: TextChunk[]): string {
-    return content
-        .map((chunk) => {
-            let text = chunk.text
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("\n", "<br>");
-            const styles: string[] = [];
-            if (chunk.style.fontFamily) {
-                const cleanFont = chunk.style.fontFamily.replace(/['"]/g, "");
-                styles.push(`font-family: '${cleanFont}'`);
-            }
-            if (chunk.style.fontSize) {
-                styles.push(`font-size: ${chunk.style.fontSize}px`);
-            }
-            if (chunk.style.fontColor) {
-                styles.push(`color: ${chunk.style.fontColor}`);
-            }
-            if (chunk.style.bold) {
-                styles.push(`font-weight: bold`);
-            }
-            if (chunk.style.italic) {
-                styles.push(`font-style: italic`);
-            }
-            if (chunk.style.underline) {
-                styles.push(`text-decoration: underline`);
-            }
-
-            return `<span style="${styles.join("; ")}">${text}</span>`;
-        })
-        .join("");
-}
-
-function placeCaretAtEnd(editor: HTMLElement) {
-    editor.focus();
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false); 
-    selection.removeAllRanges();
-    selection.addRange(range);
-}
-
-export function useRedactText(
+function useRedactText(
     element: TextObject,
     activeSlideId?: string,
     onSave?: (newContent: TextChunk[], newSize: { width: number; height: number }) => void
@@ -59,18 +14,15 @@ export function useRedactText(
     const isInternalChange = useRef(false);
     const onSaveRef = useRef(onSave);
     const elementRef = useRef(element);
-
-    useEffect(() => {
-        onSaveRef.current = onSave;
-        elementRef.current = element;
-    }, [onSave, element]);
+    onSaveRef.current = onSave;
+    elementRef.current = element;
 
     useEffect(() => {
         setIsRedact(false);
         isInitialized.current = false;
     }, [activeSlideId]);
 
-    const saveCurrentDom = useCallback(() => {
+    const saveCurrentDom = () => {
         if (editorRef.current && onSaveRef.current) {
             const editor = editorRef.current;
             const newWidth = editor.offsetWidth;
@@ -87,19 +39,11 @@ export function useRedactText(
             const newContent: TextChunk[] = parseHtmlToChunks(editor, baseStyle);
             onSaveRef.current(newContent, { width: newWidth, height: newHeight });
         }
-    }, []);
-
-    const handleDoubleClick = () => {
-        setIsRedact(true);
     };
 
-    const handleInput = () => {
-        saveCurrentDom();
-    };
-
-    const handleContainerBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-        const nextTarget = e.relatedTarget as Node | null;
-        if (nextTarget && e.currentTarget.contains(nextTarget)) {
+    const handleContainerBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+        const nextTarget = event.relatedTarget as Node | null;
+        if (nextTarget && event.currentTarget.contains(nextTarget)) {
             return;
         }
         saveCurrentDom();
@@ -107,12 +51,12 @@ export function useRedactText(
         isInitialized.current = false;
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (!(e.ctrlKey || e.metaKey)) return;
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!(event.ctrlKey || event.metaKey)) return;
         const commands: Record<string, string> = { b: "bold", i: "italic", u: "underline" };
-        const command = commands[e.key.toLowerCase()];
+        const command = commands[event.key.toLowerCase()];
         if (!command) return;
-        e.preventDefault();
+        event.preventDefault();
         document.execCommand(command, false);
         saveCurrentDom();
     };
@@ -139,9 +83,11 @@ export function useRedactText(
     return {
         isRedact,
         editorRef,
-        handleDoubleClick,
-        handleInput,
+        handleDoubleClick: () => setIsRedact(true),
+        handleInput: saveCurrentDom,
         handleContainerBlur,
         handleKeyDown,
     };
 }
+
+export {useRedactText};
