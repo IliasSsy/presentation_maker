@@ -1,0 +1,100 @@
+.textPanel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ffffff;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    position: absolute;
+    left: 0;
+    z-index: 1000;
+    white-space: nowrap;
+    width: max-content;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.textPanel select,
+.textPanel button,
+.textPanel input,
+.textPanel span,
+.textPanel div {
+    color: #1f2937 !important;
+    font-family: inherit;
+}
+
+.textPanel select {
+    background-color: #f3f4f6 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    height: 28px;
+    cursor: pointer;
+    outline: none;
+}
+
+.textPanel button {
+    background-color: transparent !important;
+    border-radius: 4px;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+}
+
+.textPanel button:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.divider {
+    width: 1px;
+    height: 20px;
+    background-color: #e5e7eb;
+    margin: 0 4px;
+}
+
+.colorPicker {
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+    padding: 2px;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.colorPicker::-webkit-color-swatch {
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+.img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    display: block;
+}
+
+.placementBottom {
+    top: calc(100% + 8px);
+}
+
+.placementTop {
+    bottom: calc(100% + 8px);
+}

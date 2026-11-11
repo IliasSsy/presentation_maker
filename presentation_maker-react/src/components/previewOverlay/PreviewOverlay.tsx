@@ -1,4 +1,4 @@
-import { SlidePreview } from "../SlidePreview/slidePreview";
+import { SlidePreview } from "../SlidePreview/SlidePreview";
 import type { Presentation } from "../../../../types/presentation";
 import { getState, dispatch } from "../../modules/editor";
 import { nextSlideModifier, prevSlideModifier } from "../../modules/modifiers";

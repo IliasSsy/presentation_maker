@@ -1,51 +1,72 @@
-import type { TextChunk, InlineStyle } from "../../../../../../types/objects";
+import type { InlineStyle, TextChunk } from "../../../../../../types/objects";
 
-type StackItem = {
-    node: Node,
-    style: InlineStyle
-}
-
-function parseHtmlToChunks(node: Node, baseStyle: InlineStyle): TextChunk[] {
+export function parseHtmlToChunks(
+    container: HTMLElement,
+    baseStyle: InlineStyle
+): TextChunk[] {
     const chunks: TextChunk[] = [];
-    const stack: StackItem[] = [{
-        node,
-        style: baseStyle
-    }];
-    
-    while (stack.length > 0) {
-        const item = stack.pop();
-        if (!item) continue;
-        
-        const currentNode = item.node;
-        const currentStyle: InlineStyle = item.style;
-        
-        if (currentNode.nodeType === Node.TEXT_NODE) {
-            const text = currentNode.textContent;
-            if (text) {
-                chunks.push({ text, style: currentStyle });  
-            }
-        } else if (currentNode.nodeType === Node.ELEMENT_NODE) {
-            const element = currentNode;
-            const nextStyle: InlineStyle = { ...currentStyle };
-            const tag = element.nodeName;
-            if (tag === 'STRONG' || tag === 'B') {
-                nextStyle.bold = true;
-            } else if (tag === 'EM' || tag === 'I') {
-                nextStyle.italic = true;
-            } else if (tag === 'U') {
-                nextStyle.underline = true;
-            }
-            const children = element.childNodes;
-            for (let i = children.length - 1; i >= 0; i--) {
-                stack.push({
-                    node: children[i],
-                    style: nextStyle
+
+    function traverse(node: Node, currentStyle: InlineStyle) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent || "";
+            if (text.length > 0) {
+                chunks.push({
+                    text,
+                    style: { ...currentStyle },
                 });
             }
+            return;
+        }
+
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as HTMLElement;
+            const tag = element.tagName.toUpperCase();
+
+            if (tag === "BR") {
+                chunks.push({
+                    text: "\n",
+                    style: { ...currentStyle },
+                });
+                return;
+            }
+
+            const nextStyle: InlineStyle = { ...currentStyle };
+            if (tag === "B" || tag === "STRONG" || element.style.fontWeight === "bold" || Number(element.style.fontWeight) >= 700) {
+                nextStyle.bold = true;
+            }
+            if (tag === "I" || tag === "EM" || element.style.fontStyle === "italic") {
+                nextStyle.italic = true;
+            }
+            if (tag === "U" || element.style.textDecoration.includes("underline") || element.style.textDecorationLine.includes("underline")) {
+                nextStyle.underline = true;
+            }
+
+            if (element.style.fontFamily) {
+                nextStyle.fontFamily = element.style.fontFamily.replace(/['"]/g, "").trim() as InlineStyle["fontFamily"];
+            } else if (tag === "FONT" && element.getAttribute("face")) {
+                nextStyle.fontFamily = element.getAttribute("face")!.replace(/['"]/g, "").trim() as InlineStyle["fontFamily"];
+            }
+            if (element.style.fontSize) {
+                const parsedSize = parseInt(element.style.fontSize, 10);
+                if (!isNaN(parsedSize)) {
+                    nextStyle.fontSize = parsedSize;
+                }
+            }
+            if (element.style.color) {
+                nextStyle.fontColor = element.style.color;
+            } else if (tag === "FONT" && element.getAttribute("color")) {
+                nextStyle.fontColor = element.getAttribute("color")!;
+            }
+
+            element.childNodes.forEach((child) => traverse(child, nextStyle));
         }
     }
 
-    return chunks;   
-}
+    container.childNodes.forEach((child) => traverse(child, baseStyle));
 
-export { parseHtmlToChunks };
+    if (chunks.length === 0) {
+        return [{ text: "", style: { ...baseStyle } }];
+    }
+
+    return chunks;
+}

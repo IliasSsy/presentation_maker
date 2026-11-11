@@ -1,16 +1,16 @@
 import type { SlideObject, Point } from "../../../../types/objects";
-import { TextObjectComp } from "./textObjectComp/TextObjectComp";
+import { TextObjectComp } from "./TextObjectComp/TextObjectComp";
 import React from "react";
 
 type SlideObjectProps = {
     object: SlideObject;
+    isSelected?: boolean;
     position: Point;
     onClick?: (e: React.MouseEvent) => void;
     onMouseDown?: (e: React.MouseEvent) => void;
-    onDoubleClick?: (e: React.MouseEvent) => void;
 };
 
-function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}: SlideObjectProps) {
+function SlideObjectComp({object, position, isSelected = false, onClick, onMouseDown}: SlideObjectProps) {
 
     const baseStyle: React.CSSProperties = {
         position: 'absolute',
@@ -29,34 +29,29 @@ function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}
         }
         onMouseDown?.(e);
     };
-
     if (object.type === 'text') {
         const { size, style } = object;
-
         return (
             <div
                 id={object.id}
                 draggable={false}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
-                onDoubleClick={onDoubleClick}
                 style={{
                     ...baseStyle,
                     width: `${size.width}px`,
                     height: `${size.height}px`,
                     backgroundColor: style.fillColor,
                     overflow: 'visible',
-                    zIndex: 6,
+                    zIndex: isSelected ? 50 : 1,
                 }}
             >
                 <TextObjectComp element={object} />
             </div>
         );
     }
-
     if (object.type === 'image') {
         const { size, url } = object;
-
         return (
             <div
                 id={object.id}
@@ -82,7 +77,6 @@ function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}
             </div>
         );
     }
-
     if (object.type === 'figure') {
         if (object.typeFigure === 'rectangle') {
             const { size, fillColor, borderColor } = object;
@@ -102,7 +96,6 @@ function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}
                 />
             );
         }
-
         if (object.typeFigure === 'circle') {
             const { radius, fillColor, borderColor } = object;
             return (
@@ -122,7 +115,6 @@ function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}
                 />
             );
         }
-
         if (object.typeFigure === 'triangle') {
             const { size, fillColor, borderColor, points } = object;
             const pointsString = points
@@ -158,7 +150,6 @@ function SlideObjectComp({object, position, onClick, onMouseDown, onDoubleClick}
             );
         }
     }
-
     return null;
 }
 

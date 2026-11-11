@@ -1,4 +1,4 @@
-import { SlidePreview } from "../SlidePreview/slidePreview.js";
+import { SlidePreview } from "../SlidePreview/SlidePreview.js";
 import type { Slide } from "../../../../types/slide";
 import styles from "./slideList.module.css"; 
 

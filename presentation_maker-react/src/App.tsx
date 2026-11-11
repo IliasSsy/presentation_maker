@@ -1,6 +1,6 @@
-import { SlideList } from "./components/slideList/SlideList";
-import { Toolbar } from "./components/toolbar/Toolbar";
-import { Workspace } from "./components/workspace/WorkSpace";
+import { SlideList } from "./components/SlideList/slideList";
+import { Toolbar } from "./components/Toolbar/Toolbar";
+import { Workspace } from "./components/Workspace/workSpace";
 import { PreviewOverlay } from "./components/previewOverlay/PreviewOverlay";
 import { getState, dispatch, getPreviewMode } from "./modules/editor";
 import { addSlideModifier, deleteSlideModifier, setActiveSlide, setPreviewModeModifier } from "./modules/modifiers";

@@ -28,7 +28,6 @@ function handleAddText(position: Point = { x: 50, y: 50 }) {
             }
         ]
     };
-
     dispatch(updateTextModifier, newTextObject);
 }
 

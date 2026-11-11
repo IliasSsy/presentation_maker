@@ -231,18 +231,18 @@ function updateTextModifier(state: EditorState, textObject: TextObject): EditorS
     const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
     if (slideIndex === -1) return state;
     const currentSlide = state.presentation.slides[slideIndex];
-    const elementExists = currentSlide.elements.some(el => el.id === textObject.id);
-    let updatedElements;
-    if (elementExists) {
-        updatedElements = currentSlide.elements.map(el => 
-            el.id === textObject.id ? textObject : el
-        );
-    } else {
-        updatedElements = [...currentSlide.elements, textObject];
-    }
+    let found = false;
+    const updatedElements = currentSlide.elements.map(el => {
+        if (el.id === textObject.id) {
+            found = true;
+            return textObject;
+        }
+        return el;
+    });
+    const finalElements = found ? updatedElements : [...updatedElements, textObject];
     const updatedSlide = {
         ...currentSlide,
-        elements: updatedElements
+        elements: finalElements
     };
     const newSlides = [...state.presentation.slides];
     newSlides[slideIndex] = updatedSlide;
@@ -268,5 +268,5 @@ export {
     moveSelectedObjectsModifier,
     resizeSelectedObjectsModifier,
     addImageObjectModifier,
-    updateTextModifier
+    updateTextModifier,
 };
