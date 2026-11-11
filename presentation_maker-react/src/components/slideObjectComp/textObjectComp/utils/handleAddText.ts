@@ -1,7 +1,7 @@
-import { generateId } from '../../../../../functions/utils';
-import { addTextObjectModifier } from '../../../modules/modifiers';
-import { dispatch } from '../../../modules/editor';
-import type { TextObject, Point } from '../../../../../types/objects';
+import { generateId } from '../../../../../../functions/utils';
+import { updateTextModifier } from '../../../../modules/modifiers';
+import { dispatch } from '../../../../modules/editor';
+import type { TextObject, Point } from '../../../../../../types/objects';
 
 function handleAddText(position: Point = { x: 50, y: 50 }) {
     const newTextObject: TextObject = {
@@ -28,8 +28,7 @@ function handleAddText(position: Point = { x: 50, y: 50 }) {
             }
         ]
     };
-
-    dispatch(addTextObjectModifier, newTextObject);
+    dispatch(updateTextModifier, newTextObject);
 }
 
 export {handleAddText}

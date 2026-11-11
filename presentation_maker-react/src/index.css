@@ -2,3 +2,8 @@ html, body, #root {
     overflow: hidden;
     box-sizing: border-box;
 }
+
+[contenteditable]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}

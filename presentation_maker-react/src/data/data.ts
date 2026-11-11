@@ -70,7 +70,7 @@ const presId = generateId();
     let newSlideId = generateId();
     presentation = addSlide(presentation, newSlideId);
     let slide2: Slide = presentation.slides[1];
-    slide2 = setSlideBackgroundColor(slide2, '#ffffff');
+    slide2 = setSlideBackgroundColor(slide2, '#e903fe');
     slide2 = addTextObject(slide2, createDefaultTextObject('Список задач:', { x: 50, y: 50 }, { width: 300, height: 40 }, { fontSize: 24, fontColor: '#000000' }));
     slide2 = addTextObject(slide2, createDefaultTextObject('1. Разработать интерфейс', { x: 50, y: 100 }, { width: 300, height: 30 }, { fontSize: 18 }));
     slide2 = addTextObject(slide2, createDefaultTextObject('2. Добавить интерактивность', { x: 50, y: 140 }, { width: 300, height: 30 }, { fontSize: 18 }));
@@ -84,7 +84,7 @@ const presId = generateId();
     newSlideId = generateId();
     presentation = addSlide(presentation, newSlideId);
     let slide3 = presentation.slides[2];
-    slide3 = setSlideBackgroundColor(slide3, '#e8f5e9');
+    slide3 = setSlideBackgroundColor(slide3, '#000000');
     slide3 = addTextObject(slide3, createDefaultTextObject('Итоги работы:', { x: 50, y: 50 }, { width: 300, height: 40 }, { fontSize: 24, fontColor: '#2e7d32' }));
     slide3 = addTextObject(slide3, createDefaultTextObject('Готово!', { x: 50, y: 120 }, { width: 200, height: 60 }, { fontSize: 36, fontColor: '#4caf50' }));
 

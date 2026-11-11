@@ -1,6 +1,6 @@
 import type { Slide } from "../../../../types/slide.js";
-import { SlidePreview } from "../slidePreview/SlidePreview.js";
-import { useSelection } from "./hooks/useSelection.js";
+import { SlidePreview } from "../SlidePreview/SlidePreview.js";
+import { useSelection } from "./hooks/useSelection.js"
 import styles from "./WorkSpace.module.css";
 
 type WorkspaceProps = {

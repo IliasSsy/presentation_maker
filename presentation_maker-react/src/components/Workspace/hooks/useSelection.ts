@@ -14,6 +14,10 @@ function useSelection() {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Delete' || event.key === 'Backspace') {
+                const activeEl = document.activeElement;
+                if (activeEl && activeEl.getAttribute('contenteditable') === 'true') {
+                    return; 
+                }
                 if (activeObjectIds.length > 0) {
                     dispatch(removeSelectedObjectsModifier, activeObjectIds);    
                     setActiveObjectIds([]);
@@ -27,7 +31,6 @@ function useSelection() {
     }, [activeObjectIds]); 
 
     function handleObjectClick(event: React.MouseEvent, objectId: string) {
-        event.preventDefault();
         if (event.shiftKey) {
             setActiveObjectIds((oldIds) => {
                 if (oldIds.includes(objectId)) {

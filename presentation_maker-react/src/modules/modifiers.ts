@@ -2,7 +2,7 @@ import type { EditorState } from "./editor";
 import type { Slide } from "../../../types/slide";
 import type { ImageObject, Point, SlideObject, TextObject } from "../../../types/objects";
 import { generateId } from "../../../functions/utils";
-import { removeObject, moveObject, resizeObject, addImageObject, addTextObject } from "../../../functions/objects";
+import { removeObject, moveObject, resizeObject, addImageObject } from "../../../functions/objects";
 
 function changePresentationTitle(state: EditorState, newName: string): EditorState {
     return {
@@ -148,13 +148,15 @@ function removeSelectedObjectsModifier(state: EditorState, selectObjectIds: stri
 
 function updateSingleElement(slide: Slide, element: SlideObject, updatedObject: SlideObject): Slide {
     if (updatedObject.type === 'text' && element.type === 'text') {
-            return resizeObject(slide, element.id, {
-                position: { ...updatedObject.position },
-                size: { ...updatedObject.size },
-                style: { ...element.style, ...updatedObject.style },
-                content: updatedObject.content 
-            });
-        }
+        return resizeObject(slide, element.id, {
+            position: { ...updatedObject.position },
+            size: { ...updatedObject.size },
+            style: { ...element.style, ...updatedObject.style },
+            content: (updatedObject.content && updatedObject.content.length > 0) 
+                ? updatedObject.content 
+                : element.content 
+        });
+    }
     if (updatedObject.type === 'image' && element.type === 'image') {
         return resizeObject(slide, element.id, {
             position: { ...updatedObject.position },
@@ -225,19 +227,32 @@ function addImageObjectModifier(state: EditorState, newImage: ImageObject): Edit
     };
 }
 
-function addTextObjectModifier(state: EditorState, newText: TextObject): EditorState {
-    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId)
-    if (slideIndex === -1) return state
-    const updateSlide = addTextObject(state.presentation.slides[slideIndex], newText)
-    const newSlides = [...state.presentation.slides]
-    newSlides[slideIndex] = updateSlide
+function updateTextModifier(state: EditorState, textObject: TextObject): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) return state;
+    const currentSlide = state.presentation.slides[slideIndex];
+    let found = false;
+    const updatedElements = currentSlide.elements.map(el => {
+        if (el.id === textObject.id) {
+            found = true;
+            return textObject;
+        }
+        return el;
+    });
+    const finalElements = found ? updatedElements : [...updatedElements, textObject];
+    const updatedSlide = {
+        ...currentSlide,
+        elements: finalElements
+    };
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
     return {
         ...state,
         presentation: {
             ...state.presentation,
             slides: newSlides
         }
-    }
+    };
 }
 
 export {
@@ -253,5 +268,5 @@ export {
     moveSelectedObjectsModifier,
     resizeSelectedObjectsModifier,
     addImageObjectModifier,
-    addTextObjectModifier
+    updateTextModifier,
 };

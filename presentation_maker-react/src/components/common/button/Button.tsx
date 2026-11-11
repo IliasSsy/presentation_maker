@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import styles from "./button.module.css"
-import { translate } from "../../../services/LanguageChoose/i18n";
+import { translate } from "../../../services/languageChoose/i18n";
 
 type ToolbarButtonProps = {
     children: ReactNode;
