@@ -1,3 +1,4 @@
+import React from "react";
 import type { Presentation } from "../../../../types/presentation.js";
 import { Button } from "../common/button/Button.js";
 import { DropList } from "../common/dropList/DropList.js";
@@ -46,6 +47,7 @@ function Toolbar({ presentation }: ToolbarProps) {
         { tooltip: "shapesButton", icon: shapeIcon, onClick: () => console.log('shapes') },
     ];
     const { fileInputRef, handleFileChange, triggerUpload } = useImageUpload();
+
     return (
         <div className={styles.toolbar}>
             <div className={styles.group}>
@@ -102,11 +104,7 @@ function Toolbar({ presentation }: ToolbarProps) {
                 <ToolbarButton tooltipKey="cursorButton" icon={cursorIcon} />
             </div>
             <div className={styles.divider} />
-            <div className={styles.group}>
-                <Button tooltipKey="Background" onClick={() => {}}>
-                    Фон
-                </Button>
-            </div>
+
             <div className={`${styles.group} ${styles.pushRight}`}>
                 <LanguageSelector />
             </div>

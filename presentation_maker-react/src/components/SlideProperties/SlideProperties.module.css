@@ -1,0 +1,224 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 400px;
+    padding: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f3f4;
+    padding-bottom: 12px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #5f6368;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.closeBtn:hover {
+    background: #f1f3f4;
+}
+
+.section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.label {
+    font-size: 14px;
+    color: #3c4043;
+    font-weight: 400;
+}
+
+.colorPickerWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.colorTriggerBtn {
+    background: #f1f3f4;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.colorTriggerBtn:hover {
+    background: #e8eaed;
+}
+
+.colorPicker {
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    width: 40px;
+    height: 32px;
+    cursor: pointer;
+    background: none;
+    padding: 2px;
+}
+
+.colorIconPreview {
+    width: 16px;
+    height: 16px;
+    background: #f29900;
+    border-radius: 3px;
+}
+
+.actionBtn, .resetBtn {
+    background: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.actionBtn {
+    color: #1a73e8;
+    border-color: #dadce0;
+}
+
+.actionBtn:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+}
+
+.resetBtn {
+    color: #d93025;
+}
+
+.resetBtn:hover {
+    background: #fef7f7;
+    border-color: #d93025;
+}
+
+.gradientSection {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #f1f3f4;
+    padding-bottom: 16px;
+}
+
+.gradientDropdown {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gradientInputs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.gradientInputs label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #3c4043;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.gradientInputs input[type="color"] {
+    border: none;
+    width: 32px;
+    height: 24px;
+    cursor: pointer;
+    background: none;
+    border-radius: 4px;
+}
+
+.angleLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #3c4043;
+    font-weight: 500;
+}
+
+.angleInput {
+    width: 56px;
+    padding: 6px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 13px;
+    background: #fff;
+    outline: none;
+}
+
+.angleInput:focus {
+    border-color: #1a73e8;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+}
+
+.primaryBtn {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.primaryBtn:hover {
+    background: #1557b0;
+}
