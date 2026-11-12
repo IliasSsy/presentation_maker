@@ -3,7 +3,7 @@ import type { TextObject, TextChunk } from "../../../../../types/objects";
 import { dispatch, getState } from "../../../modules/editor";
 import { updateTextModifier } from "../../../modules/modifiers";
 import { TextPanel } from "../../TextPanel/TextPanel";
-import { useRedactText } from "./hooks/useRedactText"; 
+import { useRedactText } from "./hooks/useRedactText";
 
 type TextObjectProps = {
     element: TextObject;

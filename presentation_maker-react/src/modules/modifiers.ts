@@ -3,6 +3,12 @@ import type { Slide } from "../../../types/slide";
 import type { ImageObject, Point, SlideObject, TextObject } from "../../../types/objects";
 import { generateId } from "../../../functions/utils";
 import { removeObject, moveObject, resizeObject, addImageObject } from "../../../functions/objects";
+import { 
+    setSlideBackgroundColor, 
+    setSlideBackgroundImage, 
+    setSlideBackgroundGradient, 
+    clearSlideBackground 
+} from "../../../functions/objects";
 
 function changePresentationTitle(state: EditorState, newName: string): EditorState {
     return {
@@ -255,6 +261,71 @@ function updateTextModifier(state: EditorState, textObject: TextObject): EditorS
     };
 }
 
+function setSlideBackgroundColorModifier(state: EditorState, color: string): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) return state;
+
+    const updatedSlide = setSlideBackgroundColor(state.presentation.slides[slideIndex], color);
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+
+    return {
+        ...state,
+        presentation: {
+            ...state.presentation,
+            slides: newSlides
+        }
+    };
+}
+
+function setSlideBackgroundImageModifier(state: EditorState, url: string): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) return state;
+
+    const updatedSlide = setSlideBackgroundImage(state.presentation.slides[slideIndex], url);
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+
+    return {
+        ...state,
+        presentation: {
+            ...state.presentation,
+            slides: newSlides
+        }
+    };
+}
+
+function setSlideBackgroundGradientModifier(state: EditorState, colors: string[], angle?: number): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) return state;
+    const updatedSlide = setSlideBackgroundGradient(state.presentation.slides[slideIndex], colors, angle);
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+
+    return {
+        ...state,
+        presentation: {
+            ...state.presentation,
+            slides: newSlides
+        }
+    };
+}
+
+function clearSlideBackgroundModifier(state: EditorState): EditorState {
+    const slideIndex = state.presentation.slides.findIndex(slide => slide.id === state.activeSlideId);
+    if (slideIndex === -1) return state;
+    const updatedSlide = clearSlideBackground(state.presentation.slides[slideIndex]);
+    const newSlides = [...state.presentation.slides];
+    newSlides[slideIndex] = updatedSlide;
+    return {
+        ...state,
+        presentation: {
+            ...state.presentation,
+            slides: newSlides
+        }
+    };
+}
+
 export {
     deleteSlideModifier,
     addSlideModifier,
@@ -269,4 +340,8 @@ export {
     resizeSelectedObjectsModifier,
     addImageObjectModifier,
     updateTextModifier,
+    clearSlideBackgroundModifier,
+    setSlideBackgroundGradientModifier,
+    setSlideBackgroundImageModifier,
+    setSlideBackgroundColorModifier
 };

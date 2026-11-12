@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react"; // 1. Импортируем useState
 import type { Slide } from "../../../../types/slide";
 import { SlideObjectComp } from "../SlideObjectComp/SlideObject"; 
 import { useDragAndDrop } from "./hooks/useDrugAndDrop";
@@ -9,6 +9,7 @@ import { moveSelectedObjectsModifier, resizeSelectedObjectsModifier } from "../.
 import { resizeObjects } from "./hooks/resize/resizeUtils";
 import { calculateSelectionBox } from "./components/SelectionBox/CalculateSelectionBox";
 import { getSlideBackground } from "./components/Background/GetBackgroundStyle";
+import { SlideProperties } from "../SlideProperties/SlideProperties.tsx"; 
 import styles from "./SlidePreview.module.css";
 
 type SlidePreviewProps = {
@@ -19,14 +20,13 @@ type SlidePreviewProps = {
 }
 
 function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClick }: SlidePreviewProps) {
+    const [isBgModalOpen, setIsBgModalOpen] = useState(false);
     const { dragOffset, isDragging, draggedObjectIds, handleMouseDown } = useDragAndDrop((delta) => {
         if (draggedObjectIds.length > 0) {
             dispatch(moveSelectedObjectsModifier, slide.id, draggedObjectIds, delta);
         }
     });
-
     const selectedElements = (slide.elements || []).filter(element => selectedIds.includes(element.id));
-    
     const { isResizing, handleResizeStart, previewBox } = useResize(
         selectedElements, 
         (newObjects) => {   
@@ -55,6 +55,10 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
             onMouseDown={(event) => {
                 if (event.button === 0 && (event.target as HTMLElement).id === 'slide-background') {
                     onBackgroundClick(event);
+                
+                    if (selectedIds.length === 0) {
+                        setIsBgModalOpen(true);
+                    }
                 }
             }}
         >
@@ -65,7 +69,6 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                     x: element.position.x + (isMoving ? dragOffset.x : 0),
                     y: element.position.y + (isMoving ? dragOffset.y : 0)
                 };
-                
                 return (
                    <SlideObjectComp 
                         key={element.id}    
@@ -86,6 +89,7 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                             if ((event.target as HTMLElement).closest('[data-panel="text-panel"]')) {
                                 return;
                             }
+                            setIsBgModalOpen(false);
                             clickStartPos.current = { x: event.clientX, y: event.clientY, wasSelected: isSelected };
                             if (!isSelected) onObjectClick(event, element.id);
                             handleMouseDown(event, isSelected ? selectedIds : [element.id]);
@@ -105,8 +109,11 @@ function SlidePreview({ slide, selectedIds = [], onObjectClick, onBackgroundClic
                     }}
                 />
             )}
+            {isBgModalOpen && selectedIds.length === 0 && (
+                <SlideProperties slide={slide} onClose={() => setIsBgModalOpen(false)} />
+            )}
         </div>
     );
 }
 
-export {SlidePreview}
+export { SlidePreview };
