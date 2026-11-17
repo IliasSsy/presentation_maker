@@ -1,4 +1,3 @@
-import React from "react";
 import type { Presentation } from "../../../../types/presentation.js";
 import { Button } from "../common/button/Button.js";
 import { DropList } from "../common/dropList/DropList.js";
@@ -12,6 +11,7 @@ import { startPreviewModifier } from "../../modules/modifiers.js";
 import { useImageUpload } from "./hooks/useImageUpload.ts";
 import type { DropListOption } from "../common/dropList/DropList.js";
 import { handleAddText } from "../SlideObjectComp/TextObjectComp/utils/handleAddText.ts";
+import usePdfExport from "./hooks/usePdfExport.tsx";
 import arrowIcon from "./icons/arrow.svg";
 import prevIcon from "./icons/undo.svg";
 import nextIcon from "./icons/rendo.svg";
@@ -29,6 +29,7 @@ type ToolbarProps = {
 type Scale = "50%" | "75%" | "100%" | "125%" | "150%" | "200%"
 
 function Toolbar({ presentation }: ToolbarProps) {
+    const { exportToPdf } = usePdfExport()
     const scaleOptions: DropListOption<Scale>[] = [
         { id: "50%", name: "50%" },
         { id: "75%", name: "75%" },
@@ -42,7 +43,7 @@ function Toolbar({ presentation }: ToolbarProps) {
         { tooltip: "redoItem", icon: nextIcon },
     ];
     const insertTools = [
-        { tooltip: "printItem", icon: printerIcon, onClick: () => console.log('Печать') },
+        { tooltip: "printItem", icon: printerIcon, onClick: () => exportToPdf(presentation) },
         { tooltip: "textButton", icon: textIcon, onClick: () => handleAddText() },
         { tooltip: "shapesButton", icon: shapeIcon, onClick: () => console.log('shapes') },
     ];

@@ -1,4 +1,5 @@
 import type { Presentation } from "../../../types/presentation.js";
+import type { Background } from "../../../types/slide.js";
 
 type EditorState = {
   presentation: Presentation;
@@ -24,6 +25,13 @@ function setInitialState(presentation: Presentation): void {
 
 function getState(): EditorState | null {
     return currentState;
+}
+
+function getHistoryState(): { canUndo: boolean; canRedo: boolean } {
+    return {
+        canUndo: past.length > 0,
+        canRedo: future.length > 0,
+    };
 }
 
 type Modifier = (state: EditorState, ...args: any[]) => EditorState;
@@ -66,34 +74,54 @@ function redo(): void {
     }
 }
 
-function getCanUndo(): boolean {
-    return past.length > 0;
-}
-
-function getCanRedo(): boolean {
-    return future.length > 0;
-}
-
 function getPreviewMode(): boolean {
     return currentState ? currentState.isPreviewMode : false;
 }
 
-function addEditorChangeHandler(handler: () => void): void {
+function setPreviewMode(mode: boolean): void {
+    if (!currentState) return;
+    currentState = {
+        ...currentState,
+        isPreviewMode: mode
+    };
+    if (editorChangeHandler) {
+        editorChangeHandler();
+    }
+}
+
+function addEditorChangeHandler(handler: (() => void) | null): void {
     editorChangeHandler = handler;
+}
+
+function getBackgroundStyle(background?: Background): React.CSSProperties {
+    if (!background || background.type === 'none') {
+        return { backgroundColor: '#ffffff' };
+    }
+    if (background.type === 'color' || background.type === 'solid') {
+        return { backgroundColor: background.color };
+    }
+    if (background.type === 'image') {
+        return { backgroundImage: `url(${background.url})`, backgroundSize: 'cover', backgroundPosition: 'center' };
+    }
+    if (background.type === 'gradient') {
+        return { background: `linear-gradient(${background.angle}deg, ${background.colors.join(', ')})` };
+    }
+    return { backgroundColor: '#ffffff' };
 }
 
 export {
     dispatch,
     setInitialState,
     getState,
+    getHistoryState,
     addEditorChangeHandler,
     getPreviewMode,
+    setPreviewMode,
     undo,
     redo,
-    getCanUndo,
-    getCanRedo,
+    getBackgroundStyle,
 };
 
 export type {
     EditorState
-}
+};
