@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
-import { dispatch } from "../../modules/editor.js"; 
-import { 
+
+import { useEffect } from "react";
+import { dispatch } from "../../modules/editor.js";
+import {
     setSlideBackgroundColorModifier,
     setSlideBackgroundGradientModifier,
     setSlideBackgroundImageModifier,
@@ -9,37 +10,83 @@ import {
 import { useImageUpload } from "../Toolbar/hooks/useImageUpload.js";
 import type { Slide } from "../../../../types/slide.js";
 import styles from "./slideProperties.module.css";
+import { useBackground } from "./hooks/useBackground.js";
 
 type SlidePropertiesProps = {
     slide: Slide;
+    slideRef: React.RefObject<HTMLDivElement | null>;
     onClose: () => void;
 };
 
-function SlideProperties({ slide, onClose }: SlidePropertiesProps) {
-    const colorInputRef = useRef<HTMLInputElement>(null);
+function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
     const { fileInputRef, triggerUpload } = useImageUpload();
-    const [isGradientOpen, setIsGradientOpen] = useState(false);
-    const [gradientColors, setGradientColors] = useState<string[]>(["#ffffff", "#ffffff"]);
-    const [gradientAngle, setGradientAngle] = useState<number>(90);
-    const currentColor = slide.background?.type === 'color' ? slide.background.color : '#ffffff';
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const result = event.target?.result;
-                if (result) {
-                    dispatch(setSlideBackgroundImageModifier, result);
-                }
-            };
-            reader.readAsDataURL(file);
+    const {
+        isGradientOpen,
+        setIsGradientOpen,
+        draftColor,
+        setDraftColor,
+        gradientColors,
+        gradientAngle,
+        backgroundDraft,
+        handleColorChange,
+        handleGradientColorChange,
+        handleGradientAngleChange,
+        handleImageChange,
+        handleReset,
+        handleCancel: cancelPreview
+    } = useBackground({ slideRef, slide });
+
+    useEffect(() => {
+        if (
+            slide.background?.type === "color" ||
+            slide.background?.type === "solid"
+        ) {
+            setDraftColor(slide.background.color);
+        } else {
+            setDraftColor("#FFFFFF");
         }
+    }, [slide, setDraftColor]);
+
+    const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        handleImageChange(file);
+        e.target.value = "";
+    };
+
+    const handleApply = () => {
+        if (backgroundDraft) {
+            switch (backgroundDraft.type) {
+                case "color":
+                    dispatch(setSlideBackgroundColorModifier, backgroundDraft.color);
+                    break;
+                case "gradient":
+                    dispatch(
+                        setSlideBackgroundGradientModifier,
+                        backgroundDraft.colors,
+                        backgroundDraft.angle
+                    );
+                    break;
+                case "image":
+                    dispatch(setSlideBackgroundImageModifier, backgroundDraft.image);
+                    break;
+                case "reset":
+                    dispatch(clearSlideBackgroundModifier);
+                    break;
+            }
+        }
+
+        onClose();
+    };
+
+    const handleCancel = () => {
+        cancelPreview();
+        onClose();
     };
 
     const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
-            onClose();
+            handleCancel();
         }
     };
 
@@ -48,67 +95,70 @@ function SlideProperties({ slide, onClose }: SlidePropertiesProps) {
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>Фон</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>×</button>
+                    <button className={styles.closeBtn} onClick={handleCancel}>
+                        ×
+                    </button>
                 </div>
+
                 <div className={styles.section}>
                     <span className={styles.label}>Цвет</span>
-                    <input 
-                        type="color" 
-                        ref={colorInputRef}
-                        defaultValue={currentColor}
-                        onInput={(e) => dispatch(setSlideBackgroundColorModifier, (e.target as HTMLInputElement).value)}
+                    <input
+                        type="color"
+                        value={draftColor}
+                        onChange={(e) => handleColorChange(e.target.value)}
                         className={styles.colorPicker}
                     />
                 </div>
+
                 <div className={styles.gradientSection}>
-                    <div className={styles.section} style={{ marginBottom: isGradientOpen ? '12px' : '0' }}>
+                    <div
+                        className={styles.section}
+                        style={{ marginBottom: isGradientOpen ? "12px" : "0" }}
+                    >
                         <span className={styles.label}>Градиент</span>
-                        <button 
-                            className={styles.actionBtn} 
+                        <button
+                            className={styles.actionBtn}
                             onClick={() => setIsGradientOpen(!isGradientOpen)}
                         >
                             {isGradientOpen ? "Закрыть" : "Настроить градиент"}
                         </button>
                     </div>
+
                     {isGradientOpen && (
                         <div className={styles.gradientDropdown}>
                             <div className={styles.gradientInputs}>
                                 <label>
                                     Цвет 1:
-                                    <input 
-                                        type="color" 
+                                    <input
+                                        type="color"
                                         value={gradientColors[0]}
-                                        onChange={(e) => {
-                                            const newColors = [e.target.value, gradientColors[1]];
-                                            setGradientColors(newColors);
-                                            dispatch(setSlideBackgroundGradientModifier, newColors, gradientAngle);
-                                        }}
+                                        onChange={(event) =>
+                                            handleGradientColorChange(0, event.target.value)
+                                        }
                                     />
                                 </label>
+
                                 <label>
                                     Цвет 2:
-                                    <input 
-                                        type="color" 
+                                    <input
+                                        type="color"
                                         value={gradientColors[1]}
-                                        onChange={(e) => {
-                                            const newColors = [gradientColors[0], e.target.value];
-                                            setGradientColors(newColors);
-                                            dispatch(setSlideBackgroundGradientModifier, newColors, gradientAngle);
-                                        }}
+                                        onChange={(event) =>
+                                            handleGradientColorChange(1, event.target.value)
+                                        }
                                     />
                                 </label>
+
                                 <label className={styles.angleLabel}>
                                     Угол:
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         value={gradientAngle}
                                         min="0"
                                         max="360"
-                                        onChange={(e) => {
-                                            const newAngle = Number(e.target.value);
-                                            setGradientAngle(newAngle);
-                                            dispatch(setSlideBackgroundGradientModifier, gradientColors, newAngle);
-                                        }}
+                                        onChange={(event) =>
+                                            handleGradientAngleChange(Number(event.target.value))
+                                        }
                                         className={styles.angleInput}
                                     />
                                 </label>
@@ -116,30 +166,30 @@ function SlideProperties({ slide, onClose }: SlidePropertiesProps) {
                         </div>
                     )}
                 </div>
+
                 <div className={styles.section}>
                     <span className={styles.label}>Изображение</span>
                     <button className={styles.actionBtn} onClick={triggerUpload}>
                         Выбрать изображение
                     </button>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        ref={fileInputRef} 
-                        onChange={handleImageChange} 
-                        style={{ display: 'none' }} 
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={onFileInputChange}
+                        style={{ display: "none" }}
                     />
                 </div>
+
                 <div className={styles.section}>
                     <span className={styles.label}>Исходный фон</span>
-                    <button 
-                        className={styles.resetBtn} 
-                        onClick={() => dispatch(clearSlideBackgroundModifier)}
-                    >
+                    <button className={styles.resetBtn} onClick={handleReset}>
                         Сбросить
                     </button>
                 </div>
+
                 <div className={styles.footer}>
-                    <button className={styles.primaryBtn} onClick={onClose}>
+                    <button className={styles.primaryBtn} onClick={handleApply}>
                         Готово
                     </button>
                 </div>

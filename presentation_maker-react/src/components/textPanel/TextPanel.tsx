@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../common/button/Button.js";
 import { DropList } from "../common/dropList/DropList.js";
 import { dispatch } from "../../modules/editor.js";
@@ -13,15 +13,25 @@ import styles from "./textPanel.module.css";
 type TextPanelProps = {
     selectedTextObject: TextObject;
     placement?: "top" | "bottom";
+    isPickingColor?: React.RefObject<boolean>;
 };
 
-function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps) {
+function TextPanel({ selectedTextObject, placement = "bottom", isPickingColor }: TextPanelProps) {
     const currentStyle = selectedTextObject.content[0]?.style || {
         fontFamily: "Arial",
         fontSize: 16,
         fontColor: "#000000",
     };
+
+    const [previewColor, setPreviewColor] = useState<string>(toHexColor(currentStyle.fontColor));
     const savedRange = useRef<Range | null>(null);
+    const pendingColorRef = useRef<string | null>(null);
+    const previewNodeRef = useRef<HTMLSpanElement | null>(null);
+
+    useEffect(() => {
+        setPreviewColor(toHexColor(currentStyle.fontColor));
+    }, [selectedTextObject.id, currentStyle.fontColor]);
+
     const saveSelection = () => {
         const selection = window.getSelection();
         const editor = document.querySelector('[contenteditable="true"]');
@@ -31,9 +41,56 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
             savedRange.current = range.cloneRange();
         }
     };
+
+    const initColorPreviewNode = (initialColor: string) => {
+        const editor = document.querySelector<HTMLElement>('[contenteditable="true"]');
+        if (!editor) return;
+        const range = savedRange.current;
+        let targetRange: Range;
+        if (range && !range.collapsed) {
+            targetRange = range.cloneRange();
+        } else {
+            targetRange = document.createRange();
+            targetRange.selectNodeContents(editor);
+        }
+        const fragment = targetRange.extractContents();
+        fragment.querySelectorAll<HTMLElement>("*").forEach((el) => {
+            el.style.color = "";
+            el.removeAttribute("color");
+        });
+        const span = document.createElement("span");
+        span.style.color = initialColor;
+        span.appendChild(fragment);
+        targetRange.insertNode(span);
+        const newRange = document.createRange();
+        newRange.selectNodeContents(span);
+        savedRange.current = newRange;
+        previewNodeRef.current = span;
+    };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newColor = e.target.value;
+        setPreviewColor(newColor);
+        pendingColorRef.current = newColor;
+        if (!previewNodeRef.current) {
+            initColorPreviewNode(newColor);
+        } else {
+            previewNodeRef.current.style.color = newColor;
+        }
+    };
+    const commitColorChange = () => {
+        if (isPickingColor) isPickingColor.current = false;
+        const finalColor = pendingColorRef.current;
+        previewNodeRef.current = null;
+        pendingColorRef.current = null;
+        if (finalColor) {
+            applyTextStyle(selectedTextObject, savedRange, "foreColor", { fontColor: finalColor }, finalColor);
+        }
+    };
+    
     const handleSizeChange = (size: FontSize) => {
         applyTextStyle(selectedTextObject, savedRange, "fontSize", { fontSize: Number(size) }, "7", (editor) => {
-            editor.querySelectorAll<HTMLElement>("span, font").forEach(element => {
+            editor.querySelectorAll<HTMLElement>("span, font").forEach((element) => {
                 if (element.getAttribute("size") === "7" || element.style.fontSize.includes("xxx-large")) {
                     element.removeAttribute("size");
                     element.style.fontSize = `${size}px`;
@@ -68,7 +125,9 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
             <div className={styles.group}>
                 <DropList
                     defaultValue={currentStyle.fontFamily}
-                    onChange={(font) => applyTextStyle(selectedTextObject, savedRange, "fontName", { fontFamily: font }, font)}
+                    onChange={(font) =>
+                        applyTextStyle(selectedTextObject, savedRange, "fontName", { fontFamily: font }, font)
+                    }
                     options={FONT_OPTIONS}
                 />
             </div>
@@ -89,7 +148,16 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
                 </div>
                 <div onMouseDown={(e) => handleFormat(e, "italic")}>
                     <Button tooltipKey="italic" onClick={() => {}}>
-                        <span style={{ fontStyle: "italic", fontWeight: 600, fontSize: "15px", fontFamily: "Georgia, serif" }}>I</span>
+                        <span
+                            style={{
+                                fontStyle: "italic",
+                                fontWeight: 600,
+                                fontSize: "15px",
+                                fontFamily: "Georgia, serif",
+                            }}
+                        >
+                            I
+                        </span>
                     </Button>
                 </div>
                 <div onMouseDown={(e) => handleFormat(e, "underline")}>
@@ -102,9 +170,14 @@ function TextPanel({ selectedTextObject, placement = "bottom" }: TextPanelProps)
             <div className={styles.group}>
                 <input
                     type="color"
-                    value={toHexColor(currentStyle.fontColor)}
-                    onMouseDown={saveSelection}
-                    onChange={(e) => applyTextStyle(selectedTextObject, savedRange, "foreColor", { fontColor: e.target.value }, e.target.value)}
+                    value={previewColor}
+                    onMouseDown={() => {
+                        if (isPickingColor) isPickingColor.current = true;
+                        saveSelection();
+                        previewNodeRef.current = null;
+                    }}
+                    onChange={handleColorChange}
+                    onBlur={commitColorChange}
                     className={styles.colorPicker}
                     title="Цвет текста"
                 />

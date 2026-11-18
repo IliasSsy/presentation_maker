@@ -37,23 +37,28 @@ function applyTextStyle(
 ) {
     const editor = document.querySelector('[contenteditable="true"]') as HTMLElement | null;
     const selection = window.getSelection();
-    
     if (selection && savedRangeRef.current) {
         selection.removeAllRanges();
         selection.addRange(savedRangeRef.current);
     }
-
     if (editor && savedRangeRef.current && !savedRangeRef.current.collapsed) {
         if (command !== "foreColor") editor.focus();
         document.execCommand("styleWithCSS", false, "true");
         document.execCommand(command, false, value);
-        afterExec?.(editor);
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+        if (afterExec) afterExec(editor)
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            savedRangeRef.current = selection.getRangeAt(0).cloneRange();
         }
-
-        editor.dispatchEvent(new Event("input", { bubbles: true }));
+        if (command !== "foreColor") {
+            editor.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+    } else if (command === "foreColor" && editor && fallbackPatch.fontColor) {
+        editor.style.color = fallbackPatch.fontColor;
+        editor.querySelectorAll<HTMLElement>("span, font").forEach((el) => {
+            el.style.color = fallbackPatch.fontColor!;
+            el.removeAttribute("color");
+        });
     } else {
         dispatch(updateTextModifier, {
             ...selectedTextObject,

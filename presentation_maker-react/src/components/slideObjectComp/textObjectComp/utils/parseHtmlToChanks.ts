@@ -33,14 +33,12 @@ function parseHtmlToChunks(
     baseStyle: InlineStyle
 ): TextChunk[] {
     const chunks: TextChunk[] = [];
-
     function traverse(node: Node, style: InlineStyle) {
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent || "";
             if (text) chunks.push({ text, style });
             return;
         }
-
         if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as HTMLElement;
             const tag = element.tagName;

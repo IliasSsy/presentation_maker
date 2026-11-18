@@ -4,18 +4,16 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-
 import type { Presentation } from '../../../../../types/presentation.ts';
 import { SlidePreview } from '../../SlidePreview/SlidePreview.tsx';
 
 const usePdfExport = () => {
     const isExporting = useRef(false);
-
     const exportToPdf = useCallback(async (presentation: Presentation) => {
         if (isExporting.current || !presentation.slides.length) return;
 
-        const rootElement = document.getElementById('exportToPdfRoot');
-        if (!rootElement) return;
+        const rootElement = document.createElement('div');
+        document.body.appendChild(rootElement);
 
         isExporting.current = true;
 
@@ -42,9 +40,7 @@ const usePdfExport = () => {
                 </>
             );
         });
-
         await document.fonts.ready;
-
         const slides = rootElement.querySelectorAll('.slide-canvas');
 
         for (let i = 0; i < slides.length; i++) {
@@ -76,6 +72,7 @@ const usePdfExport = () => {
         }
 
         root.unmount();
+        rootElement.remove()
         isExporting.current = false;
 
         pdf.save(`${presentation.name}.pdf`);
