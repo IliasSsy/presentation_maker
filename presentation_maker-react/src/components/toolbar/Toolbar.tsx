@@ -6,8 +6,7 @@ import { LanguageSelector } from "../../services/languageChoose/ChooseLanguage.t
 import { translate } from "../../services/languageChoose/i18n.ts";
 import { dispatch } from "../../modules/editor.js"; 
 import { ToolbarButton } from "./toolbarButton/ToolbarButton.tsx";
-import { changePresentationTitle } from "../../modules/modifiers.js";
-import { startPreviewModifier } from "../../modules/modifiers.js";
+import { changePresentationTitle, startPreviewModifier } from "../../modules/modifiers.js";
 import { useImageUpload } from "./hooks/useImageUpload.ts";
 import type { DropListOption } from "../common/dropList/DropList.js";
 import { handleAddText } from "../SlideObjectComp/TextObjectComp/utils/handleAddText.ts";
@@ -24,12 +23,16 @@ import styles from "./toolbar.module.css";
 
 type ToolbarProps = {
     presentation: Presentation;
-}
+    canUndo: boolean;
+    canRedo: boolean;
+    onUndo: () => void;
+    onRedo: () => void;
+};
 
-type Scale = "50%" | "75%" | "100%" | "125%" | "150%" | "200%"
+type Scale = "50%" | "75%" | "100%" | "125%" | "150%" | "200%";
 
-function Toolbar({ presentation }: ToolbarProps) {
-    const { exportToPdf } = usePdfExport()
+function Toolbar({ presentation, canUndo, canRedo, onUndo, onRedo }: ToolbarProps) {
+    const { exportToPdf } = usePdfExport();
     const scaleOptions: DropListOption<Scale>[] = [
         { id: "50%", name: "50%" },
         { id: "75%", name: "75%" },
@@ -38,15 +41,18 @@ function Toolbar({ presentation }: ToolbarProps) {
         { id: "150%", name: "150%" },
         { id: "200%", name: "200%" },
     ];
+
     const historyTools = [
-        { tooltip: "undoItem", icon: prevIcon },
-        { tooltip: "redoItem", icon: nextIcon },
+        { tooltip: "undoItem", icon: prevIcon, onClick: onUndo, disabled: !canUndo },
+        { tooltip: "redoItem", icon: nextIcon, onClick: onRedo, disabled: !canRedo },
     ];
+
     const insertTools = [
         { tooltip: "printItem", icon: printerIcon, onClick: () => exportToPdf(presentation) },
         { tooltip: "textButton", icon: textIcon, onClick: () => handleAddText() },
         { tooltip: "shapesButton", icon: shapeIcon, onClick: () => console.log('shapes') },
     ];
+
     const { fileInputRef, handleFileChange, triggerUpload } = useImageUpload();
 
     return (
@@ -72,7 +78,12 @@ function Toolbar({ presentation }: ToolbarProps) {
             <div className={styles.divider} />
             <div className={styles.group}>
                 {historyTools.map((tool) => (
-                    <ToolbarButton key={tool.tooltip} tooltipKey={tool.tooltip} icon={tool.icon} />
+                    <ToolbarButton 
+                        key={tool.tooltip} 
+                        tooltipKey={tool.tooltip} 
+                        icon={tool.icon} 
+                        onClick={tool.onClick}
+                    />
                 ))}
             </div>
             <div className={styles.divider} />

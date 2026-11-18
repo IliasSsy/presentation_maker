@@ -11,7 +11,11 @@ let currentState: EditorState | null = null;
 let past: EditorState[] = [];
 let future: EditorState[] = [];
 
-let editorChangeHandler: (() => void) | null = null;
+let editorChangeHandlers: (() => void)[] = [];
+
+function notifyHandlers(): void {
+    editorChangeHandlers.forEach((handler) => handler());
+}
 
 function setInitialState(presentation: Presentation): void {
     currentState = {
@@ -27,10 +31,18 @@ function getState(): EditorState | null {
     return currentState;
 }
 
+function getCanUndo(): boolean {
+    return past.length > 0;
+}
+
+function getCanRedo(): boolean {
+    return future.length > 0;
+}
+
 function getHistoryState(): { canUndo: boolean; canRedo: boolean } {
     return {
-        canUndo: past.length > 0,
-        canRedo: future.length > 0,
+        canUndo: getCanUndo(),
+        canRedo: getCanRedo(),
     };
 }
 
@@ -47,9 +59,7 @@ function dispatch(modifier: Modifier, ...args: any[]): void {
 
     currentState = modifier(currentState, ...args);
 
-    if (editorChangeHandler) {
-        editorChangeHandler();
-    }
+    notifyHandlers();
 }
 
 function undo(): void {
@@ -58,9 +68,7 @@ function undo(): void {
     const previous = past[past.length - 1];
     past = past.slice(0, -1);
     currentState = previous;
-    if (editorChangeHandler) {
-        editorChangeHandler();
-    }
+    notifyHandlers();
 }
 
 function redo(): void {
@@ -69,9 +77,7 @@ function redo(): void {
     const next = future[0];
     future = future.slice(1);
     currentState = next;
-    if (editorChangeHandler) {
-        editorChangeHandler();
-    }
+    notifyHandlers();
 }
 
 function getPreviewMode(): boolean {
@@ -84,13 +90,19 @@ function setPreviewMode(mode: boolean): void {
         ...currentState,
         isPreviewMode: mode
     };
-    if (editorChangeHandler) {
-        editorChangeHandler();
-    }
+    notifyHandlers();
 }
 
-function addEditorChangeHandler(handler: (() => void) | null): void {
-    editorChangeHandler = handler;
+function addEditorChangeHandler(handler: (() => void) | null): () => void {
+    if (!handler) return () => {};
+
+    editorChangeHandlers = [...editorChangeHandlers, handler];
+
+    return () => {
+        editorChangeHandlers = editorChangeHandlers.filter(
+            (arrayHandler) => arrayHandler !== handler
+        );
+    };
 }
 
 function getBackgroundStyle(background?: Background): React.CSSProperties {
@@ -113,6 +125,8 @@ export {
     dispatch,
     setInitialState,
     getState,
+    getCanUndo,
+    getCanRedo,
     getHistoryState,
     addEditorChangeHandler,
     getPreviewMode,
