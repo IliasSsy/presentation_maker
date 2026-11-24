@@ -10,6 +10,7 @@ function useImageUpload() {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (event) => {
+            console.log(event.target?.result)
             dispatch(addImageObjectModifier, {
                 id: generateId(),
                 type: "image",

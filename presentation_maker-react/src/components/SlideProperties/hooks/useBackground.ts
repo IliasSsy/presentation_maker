@@ -14,7 +14,7 @@ type UseBackgroundProps = {
     slide: Slide;
 };
 
-export function useBackground({ slideRef, slide }: UseBackgroundProps) {
+function useBackground({ slideRef, slide }: UseBackgroundProps) {
     const [isGradientOpen, setIsGradientOpen] = useState(false);
 
     const initialColor =
@@ -24,7 +24,7 @@ export function useBackground({ slideRef, slide }: UseBackgroundProps) {
 
     const [draftColor, setDraftColor] = useState(initialColor);
     const [gradientColors, setGradientColors] = useState<[string, string]>(["#FFFFFF", "#FFFFFF"]);
-    const [gradientAngle, setGradientAngle] = useState(90);
+    const [gradientAngle, setGradientAngle] = useState<number | "">(90);
     const [backgroundDraft, setBackgroundDraft] = useState<BackgroundDraft | null>(null);
 
     useEffect(() => {
@@ -53,22 +53,18 @@ export function useBackground({ slideRef, slide }: UseBackgroundProps) {
     const updatePreview = (draft: BackgroundDraft) => {
         const element = slideRef.current;
         if (!element) return;
-
         switch (draft.type) {
             case "color":
                 element.style.background = draft.color;
                 break;
-
             case "gradient":
                 element.style.background =
                     `linear-gradient(${draft.angle}deg, ${draft.colors.join(", ")})`;
                 break;
-
             case "image":
                 element.style.background =
                     `url("${draft.image}") center / cover no-repeat`;
                 break;
-
             case "reset":
                 restoreSlideBackground();
                 break;
@@ -88,17 +84,19 @@ export function useBackground({ slideRef, slide }: UseBackgroundProps) {
     const handleGradientColorChange = (index: 0 | 1, color: string) => {
         const colors: [string, string] = [...gradientColors];
         colors[index] = color;
-
+        const angle = gradientAngle === "" ? 90 : gradientAngle;
         setGradientColors(colors);
         applyDraft({
             type: "gradient",
             colors,
-            angle: gradientAngle
+            angle
         });
     };
 
-    const handleGradientAngleChange = (angle: number) => {
+    const handleGradientAngleChange = (angle: number | "") => {
         setGradientAngle(angle);
+        if (angle === "") return;
+
         applyDraft({
             type: "gradient",
             colors: gradientColors,
@@ -108,14 +106,10 @@ export function useBackground({ slideRef, slide }: UseBackgroundProps) {
 
     const handleImageChange = (file: File | undefined) => {
         if (!file) return;
-
         const reader = new FileReader();
-
         reader.onload = (event) => {
             const result = event.target?.result;
-
             if (typeof result !== "string") return;
-
             applyDraft({ type: "image", image: result });
         };
 
@@ -147,3 +141,5 @@ export function useBackground({ slideRef, slide }: UseBackgroundProps) {
         handleCancel
     };
 }
+
+export {useBackground}

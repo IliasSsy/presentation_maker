@@ -42,7 +42,7 @@ function SlideObjectComp({object, position, isSelected = false, onClick, onMouse
                     height: `${size.height}px`,
                     backgroundColor: style.fillColor,
                     overflow: 'visible',
-                    zIndex: isSelected ? 50 : 1,
+                    zIndex: isSelected ? 20 : 1,
                 }}
             >
                 <TextObjectComp element={object} />

@@ -83,6 +83,7 @@ function Toolbar({ presentation, canUndo, canRedo, onUndo, onRedo }: ToolbarProp
                         tooltipKey={tool.tooltip} 
                         icon={tool.icon} 
                         onClick={tool.onClick}
+                        disabled={tool.disabled}
                     />
                 ))}
             </div>
@@ -100,7 +101,7 @@ function Toolbar({ presentation, canUndo, canRedo, onUndo, onRedo }: ToolbarProp
                     ref={fileInputRef} 
                     onChange={handleFileChange} 
                     style={{ display: 'none' }} 
-                />
+                /> 
             </div>
             <div className={styles.divider} />
             <div className={styles.group}>

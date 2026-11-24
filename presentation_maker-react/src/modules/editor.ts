@@ -95,9 +95,7 @@ function setPreviewMode(mode: boolean): void {
 
 function addEditorChangeHandler(handler: (() => void) | null): () => void {
     if (!handler) return () => {};
-
     editorChangeHandlers = [...editorChangeHandlers, handler];
-
     return () => {
         editorChangeHandlers = editorChangeHandlers.filter(
             (arrayHandler) => arrayHandler !== handler

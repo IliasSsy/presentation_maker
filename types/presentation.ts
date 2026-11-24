@@ -1,4 +1,4 @@
-import type { Slide as Slide } from './slide.ts';
+import type { Slide as Slide } from './slide.js';
 
 type Presentation = {
     id: string;

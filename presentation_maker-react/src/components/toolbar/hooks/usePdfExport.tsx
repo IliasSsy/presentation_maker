@@ -1,4 +1,3 @@
-
 import { useCallback, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -11,15 +10,10 @@ const usePdfExport = () => {
     const isExporting = useRef(false);
     const exportToPdf = useCallback(async (presentation: Presentation) => {
         if (isExporting.current || !presentation.slides.length) return;
-
+        isExporting.current = true;
         const rootElement = document.createElement('div');
         document.body.appendChild(rootElement);
-
-        isExporting.current = true;
-
-        const pdf = new jsPDF('l', 'mm', 'a4');
         const root = createRoot(rootElement);
-
         flushSync(() => {
             root.render(
                 <>
@@ -40,27 +34,24 @@ const usePdfExport = () => {
                 </>
             );
         });
-        await document.fonts.ready;
+        const images = Array.from(rootElement.querySelectorAll('img'));
+        await Promise.all([
+            document.fonts.ready,
+            ...images.map(img => new Promise(resolve => {
+                if (img.complete) return resolve(null);
+                img.onload = resolve;
+                img.onerror = resolve;
+            })),
+        ]);
+        const pdf = new jsPDF('l', 'mm', 'a4');
         const slides = rootElement.querySelectorAll('.slide-canvas');
-
         for (let i = 0; i < slides.length; i++) {
-            for (const img of slides[i].querySelectorAll('img')) {
-                if (img.complete) continue;
-
-                await new Promise(resolve => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                });
-            }
-
             const canvas = await html2canvas(slides[i] as HTMLElement, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
             });
-
             if (i > 0) pdf.addPage();
-
             pdf.addImage(
                 canvas.toDataURL('image/png'),
                 'PNG',
@@ -70,15 +61,11 @@ const usePdfExport = () => {
                 210
             );
         }
-
         root.unmount();
-        rootElement.remove()
+        rootElement.remove();
         isExporting.current = false;
-
         pdf.save(`${presentation.name}.pdf`);
     }, []);
-
     return { exportToPdf };
 };
-
 export default usePdfExport;

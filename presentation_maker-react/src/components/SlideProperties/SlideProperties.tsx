@@ -99,7 +99,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                         ×
                     </button>
                 </div>
-
                 <div className={styles.section}>
                     <span className={styles.label}>Цвет</span>
                     <input
@@ -109,7 +108,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                         className={styles.colorPicker}
                     />
                 </div>
-
                 <div className={styles.gradientSection}>
                     <div
                         className={styles.section}
@@ -123,7 +121,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                             {isGradientOpen ? "Закрыть" : "Настроить градиент"}
                         </button>
                     </div>
-
                     {isGradientOpen && (
                         <div className={styles.gradientDropdown}>
                             <div className={styles.gradientInputs}>
@@ -137,7 +134,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                                         }
                                     />
                                 </label>
-
                                 <label>
                                     Цвет 2:
                                     <input
@@ -148,7 +144,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                                         }
                                     />
                                 </label>
-
                                 <label className={styles.angleLabel}>
                                     Угол:
                                     <input
@@ -157,7 +152,9 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                                         min="0"
                                         max="360"
                                         onChange={(event) =>
-                                            handleGradientAngleChange(Number(event.target.value))
+                                            handleGradientAngleChange(
+                                                event.target.value ? Number(event.target.value) : 
+                                            "")
                                         }
                                         className={styles.angleInput}
                                     />
@@ -166,7 +163,6 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                         </div>
                     )}
                 </div>
-
                 <div className={styles.section}>
                     <span className={styles.label}>Изображение</span>
                     <button className={styles.actionBtn} onClick={triggerUpload}>
@@ -180,14 +176,12 @@ function SlideProperties({ slide, slideRef, onClose }: SlidePropertiesProps) {
                         style={{ display: "none" }}
                     />
                 </div>
-
                 <div className={styles.section}>
                     <span className={styles.label}>Исходный фон</span>
                     <button className={styles.resetBtn} onClick={handleReset}>
                         Сбросить
                     </button>
                 </div>
-
                 <div className={styles.footer}>
                     <button className={styles.primaryBtn} onClick={handleApply}>
                         Готово

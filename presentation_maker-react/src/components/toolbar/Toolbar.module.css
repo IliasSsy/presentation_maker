@@ -42,3 +42,8 @@
 .titleInput:focus {
     background-color: rgba(255, 255, 255, 0.15);
 }
+
+.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}

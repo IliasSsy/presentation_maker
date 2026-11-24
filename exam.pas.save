@@ -1,0 +1,19 @@
+PROGRAM CopyLastSymbolOfEveStrings(INPUT, OUTPUT);
+VAR
+  Ch: CHAR
+BEGIN
+  Ch := ''
+  WHILE NOT EOF(INPUT)
+  DO
+    BEGIN
+      WHILE NOT EOLN(INPUT)
+      DO
+        READ(INPUT, Ch);
+      WRITE(Ch)
+      READLN(INPUT)
+      IF EOF
+      THEN
+        WRITELN
+    END;
+   WRITELN(OUTPUT)
+END
